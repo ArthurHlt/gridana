@@ -1,0 +1,21 @@
+no_check_origin: true
+drivers:
+- name: test
+  url: http://localhost:9093
+  type: alertmanager
+
+probes:
+- name: aprobe
+- name: a_second_probe
+
+route:
+  probe: aprobe
+
+color_by_labels:
+- color: yellow
+  weight: 0 # weight permit to to take the lead on other, default weight is 10
+  label_matcher:
+    match_re:
+      severity: [".*warn.*"]
+logs:
+  level: debug

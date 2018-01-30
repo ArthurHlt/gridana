@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+g_progName=$0
+g_managerUrl="http://localhost:9093/api/v1/alerts"
+g_timeoutMin="4"
+g_service=$(openssl rand -hex 4)
+g_name="AnAlert"
+g_severity="warning"
+g_env="sophia"
+g_debug=0
+
+function readOptions
+{
+  while true; do
+    case "$1" in
+      --manager-url)
+        g_managerUrl=$2
+        shift 2;;
+      --timeout)
+        g_timeoutMin=$2
+        shift 2;;
+      --env)
+        g_env=$2
+        shift 2;;
+      --service)
+        g_service=$2
+        shift 2;;
+      --name)
+        g_name=$2
+        shift 2;;
+      --severity)
+        g_severity=$2
+        shift 2;;
+      -d|--debug)
+        g_debug=1;
+        shift;;
+      -h|--help)
+        shift
+				usage;;
+      --)
+        shift;
+        break;;
+      *)
+        echo "error : internal problem near '$1' in $@"
+        usage;;
+    esac
+  done
+  l_args="$@"
+}
+
+
+function usage
+{
+  echo "usage : ${g_progName} [ options ]"
+  echo ""
+	echo "Send custom alert to targeted alert-manager."
+  echo ""
+  echo "When 'docker' is given as manager-url, the script searches for running docker instances"
+  echo "and automatcally fetches correct endpoint"
+  echo ""
+  echo "[options]"
+  echo "     --manager-url <url>          : alert-manager alert endpoint, can be given multiple time, default is ${g_managerUrl}"
+  echo "     --timeout <int>              : alert timeout in minutes, default is ${g_timeoutMin}"
+  echo "     --service <str>              : alert service, default is ${g_service} (random generated)"
+  echo "     --name <str>                 : alert name, default is ${g_name}"
+  echo "     --severity <str>             : alert severity, default is ${g_severity}"
+  echo "     --env <str>                  : alert environment, default is ${g_env}"
+  echo "  -d|--debug                      : enable bash debug (set -x), default is false"
+	echo "  -h|--help                       : Display this message"
+  echo ""
+  exit 1;
+}
+
+function error
+{
+  echo "error: $@" >&2
+  usage
+}
+
+function error_nohelp
+{
+  echo "error: $@" >&2
+  exit 1
+}
+
+function checkOptions
+{
+  test -z "${g_managerUrl}" && \
+      error "invalid empty --manager-url"
+  test -z "${g_service}" && \
+      error "invalid empty --service"
+  test -z "${g_name}" && \
+      error "invalid empty --name"
+  test -z "${g_env}" && \
+    error "invalid empty --env"
+  test -z "${g_severity}" && \
+      error "invalid empty --severity"
+}
+
+function run
+{
+  set -e
+  if [ ${g_debug} -eq 1 ]; then
+      set -x
+  fi
+
+  if [ ${g_managerUrl} = "docker" ]; then
+      local l_root=$(dirname $0)
+      error_nohelp "not yet implemented"
+      # ${l_root}/chk_run_docker_compose.sh || {
+      # error_nohelp "could not find running docker instance"
+      # }
+      # g_managerUrl=""
+  fi
+
+  local tztmp=`date +%z`
+  local start_date=`date +%Y-%m-%dT%T`
+  local start_date="$start_date${tztmp:0:3}:${tztmp:3:2}"
+  local l_json=$(mktemp)
+  local end_date=$(date -v +${g_timeoutMin}M +%Y-%m-%dT%T)
+  test -z "${end_date}" && {
+    end_date=$(date --date "+ ${g_timeoutMin} minutes" +%Y-%m-%dT%T 2>/dev/null)
+  }
+  end_date="$end_date${tztmp:0:3}:${tztmp:3:2}"
+
+  cat - > ${l_json} <<EOF
+  [
+    {
+      "labels": {
+        "service": "${g_service}",
+        "environment": "${g_env}",
+        "alertname": "${g_name}",
+        "severity": "${g_severity}"
+      },
+      "annotations": {
+        "summary": "This is a summary but for a second alert",
+        "description": "<>Just some details \nnext message"
+      },
+      "startsAt": "${start_date}",
+      "endsAt": "${end_date}",
+      "generatorURL": "http://localhost:8080"
+    }
+  ]
+EOF
+
+  curl -s -o /dev/null -H "Content-Type: application/json" -X POST -d @${l_json} "${g_managerUrl}" || {
+    rm -f ${l_json}
+    error_nohelp "unable to send alert to manager ${g_managerUrl}"
+  }
+
+  cat ${l_json}
+  rm -f ${l_json}
+}
+
+l_parseResult=`getopt -o dh \
+		--long env:,manager-url:,timeout:,service:,name:,severity:,debug,help \
+		-n "${g_progName}" -- "$@"`
+
+if [ $? != 0 ]; then
+    usage
+fi
+
+eval set -- "${l_parseResult}"
+readOptions "$@"
+checkOptions
+run "${l_args}"

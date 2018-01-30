@@ -1,0 +1,32 @@
+<nav class="blue-grey lighten-1" role="navigation">
+  <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">{{ title }}</a>
+    <ul class="right hide-on-med-and-down">
+      <li>
+        <a href="#">
+          <i class="large material-icons">settings</i>
+        </a>
+      </li>
+      <li>
+        <a href="#" materialize="sideNav" [materializeParams]="[{edge:'right', menuWidth:'650'}]" data-activates="alert-nav">
+          <i class="large material-icons">notifications</i>
+        </a>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+
+<div class="container">
+  <app-alerts></app-alerts>
+  <!--<ul>-->
+  <!--<li *ngFor="let alert of alerts">{{alert.id}}-->
+  <!--<div [innerHTML]="alert.message"></div>-->
+  <!--</li>-->
+  <!--</ul>-->
+  <!--<ul>-->
+  <!--<li *ngFor="let identifier of orderedAlerts?.identifiers">{{identifier}}</li>-->
+  <!--</ul>-->
+  <br><br>
+</div>
+
+

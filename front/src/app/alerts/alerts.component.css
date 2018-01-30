@@ -1,0 +1,72 @@
+table.center {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.circle {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    /* width and height can be anything, as long as they're equal */
+}
+
+table {
+    width: auto;
+}
+
+table td {
+    padding: 3px 5px;
+    border: 1px solid #d0d0d0;
+}
+
+table tr:first-child th {
+    border-top: 0;
+}
+
+table tr:last-child td {
+    border-bottom: 0;
+}
+
+table tr td:first-child,
+table tr th:first-child {
+    border-left: 0;
+}
+
+table tr td:last-child,
+table tr th:last-child {
+    border-right: 0;
+}
+
+.probe-color {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+th.identifier {
+    width: 250px;
+}
+
+th.probe {
+    height: 107px;
+    white-space: nowrap;
+    width: 35px;
+    padding-left: 3px;
+    padding-right: 0;
+    font-size: 12px;
+}
+
+th.probe > div {
+    transform: translate(0px, 51px) rotate(315deg);
+    width: 30px;
+}
+
+th.probe > div > span {
+    display: inline-block;
+    border-top: 1px solid #d0d0d0;
+    padding: 2px 22px;
+    width: 75px;
+}

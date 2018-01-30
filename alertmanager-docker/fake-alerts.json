@@ -1,0 +1,14 @@
+[
+  {
+    "labels": {
+      "label": "kjdfklj"
+    },
+    "annotations": {
+      "summary": "CF: Routes not being registered",
+      "description": "It has been at least 30 seconds since a router received a 'router.register' message from an app: {{bosh_deployment}}/{{bosh_job_name}}/{{bosh_job_id}} {{$value}}ms"
+    },
+    "startsAt": "2017-01-27T17:34:18+01:00",
+    "endsAt": "2017-01-27T17:50:18+01:00",
+    "generatorURL": "http://localhost:8080"
+  }
+]
