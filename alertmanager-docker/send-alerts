@@ -117,7 +117,7 @@ function run
   local start_date=`date +%Y-%m-%dT%T`
   local start_date="$start_date${tztmp:0:3}:${tztmp:3:2}"
   local l_json=$(mktemp)
-  local end_date=$(date -v +${g_timeoutMin}M +%Y-%m-%dT%T)
+  local end_date=$(date -v +${g_timeoutMin}M +%Y-%m-%dT%T 2>/dev/null)
   test -z "${end_date}" && {
     end_date=$(date --date "+ ${g_timeoutMin} minutes" +%Y-%m-%dT%T 2>/dev/null)
   }
