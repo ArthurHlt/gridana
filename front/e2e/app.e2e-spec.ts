@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('gradiana App', () => {
+describe('gridana App', () => {
   let page: AppPage;
 
   beforeEach(() => {

@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core'
 import 'rxjs/add/operator/share'
 import {Observable} from 'rxjs/Observable';
 import {Observer} from "rxjs/Observer";
+import * as Sockette from "sockette/dist/sockette";
+
 
 import {environment} from '../environments/environment';
 
@@ -17,7 +19,8 @@ export class WsAlertService {
   }
 
   private create(url): Observable<MessageEvent> {
-    let ws = new WebSocket(url);
+    console.log(Sockette);
+    let ws = new Sockette(url);
 
     return Observable.create(
       (obs: Observer<MessageEvent>) => {

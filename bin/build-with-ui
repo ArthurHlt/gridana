@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+current=`dirname $0`
+
+"$current/build-ui"
+
+go build -tags ui -o ./output/gridana github.com/ArthurHlt/gridana/server/...

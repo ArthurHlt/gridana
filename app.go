@@ -47,6 +47,7 @@ func (a App) start(c *cli.Context) error {
 	api := a.bootstrapApi(mDrivers)
 	r := mux.NewRouter()
 	api.Register(r)
+	r.NewRoute().Handler(http.FileServer(assetFS()))
 	log.WithField("listen_addr", a.config.ListenAddr).
 		Info("Server started and listening.")
 	corsHandler := cors.AllowAll()

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+current=`dirname $0`
+cwd=`pwd`
+
+cd "$current/../front"
+ng build --output-path ../dist
+cd "../"
+
+
+go-bindata-assetfs -pkg gridana -tags ui dist/...
+
+mv bindata_assetfs.go ui.go
+cd "$cwd"
