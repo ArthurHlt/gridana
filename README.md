@@ -21,7 +21,7 @@ Builtin drivers:
 **Retrieve with `go get github.com/ArthurHlt/gridana` and go to `$GOPATH/src/github.com/ArthurHlt/gridana`**
 
 1. Run docker
-2. Run alertmanager with docker-compose: `docker-compose up -d -f alertmanager-docker/docker-compose.yml`
+2. Run alertmanager with docker-compose: `docker-compose -f alertmanager-docker/docker-compose.yml up -d`
 3. Run gridana backend: `go run server/main.go` (You can configure the `config.yml` file for set your own routing)
 4. Go to `front` directory and run `npm install`
 5. Run from this folder: `ng serve --open`
