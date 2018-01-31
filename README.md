@@ -22,9 +22,10 @@ Builtin drivers:
 
 1. Run docker
 2. Run alertmanager with docker-compose: `docker-compose -f alertmanager-docker/docker-compose.yml up -d`
-3. Run gridana backend: `go run server/main.go` (You can configure the `config.yml` file for set your own routing)
-4. Go to `front` directory and run `npm install`
-5. Run from this folder: `ng serve --open`
+3. Set your loopback to be able to receive alerts from alertmanager: `sudo ifconfig lo0 alias 10.200.10.1/24`
+4. Run gridana backend: `go run server/main.go` (You can configure the `config.yml` file for set your own routing)
+5. Go to `front` directory and run `npm install`
+6. Run from this folder: `ng serve --open`
 
 You can now push alerts to alert manager with the helper `send-alerts` 
 inside `alertmanager-docker`, e.g.: `./alertmanager-docker/send-alerts --timeout 60` (this will make alert expire after 1h)

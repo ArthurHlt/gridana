@@ -29,7 +29,7 @@ func (a App) Run(args []string) {
 			Usage: "Path to configuration file",
 		},
 	}
-	app.Name = "gradiana"
+	app.Name = "gridana"
 	app.Action = a.start
 
 	app.Run(args)

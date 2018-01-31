@@ -3,12 +3,12 @@ package model
 import "fmt"
 
 type DriverConfig struct {
-	Name               string `json:"name"`
-	URL                string `json:"url"`
-	User               string `json:"user"`
-	Password           string `json:"password"`
-	InsecureSkipVerify bool   `json:"insecure_skip_verify"`
-	Type               string `json:"type"`
+	Name               string `yaml:"name" json:"name"`
+	URL                string `yaml:"url" json:"url"`
+	User               string `yaml:"user" json:"user"`
+	Password           string `yaml:"password" json:"password"`
+	InsecureSkipVerify bool   `yaml:"insecure_skip_verify" json:"insecure_skip_verify"`
+	Type               string `yaml:"type" json:"type"`
 	// Catches all undefined fields and must be empty after parsing.
 	XXX map[string]interface{} `yaml:",inline"`
 }
