@@ -9,7 +9,6 @@ import {CardAlertsComponent} from "../card-alerts/card-alerts.component";
 import {PushNotificationsService} from "ng-push";
 import {capitalizeFirstLetter} from "../utils";
 import {ConfigService} from "../config.service";
-import {Observable} from "rxjs/Rx";
 
 @Component({
   selector: 'app-alerts',
@@ -47,7 +46,6 @@ export class AlertsComponent implements OnInit {
 
   ngOnInit() {
     this.browserNotifSvc.requestPermission();
-    this.purgeAlertsCron();
     this.getOrderedAlerts();
     this.getProbes();
     this.wsAlert.observable.subscribe((event: MessageEvent) => {
@@ -309,23 +307,6 @@ export class AlertsComponent implements OnInit {
           }
         }
       });
-  }
-
-  purgeAlertsCron(): void {
-    Observable.interval(2000 * 60).subscribe(x => {
-      let toDelete: Alert[] = [];
-      let now = Date.now();
-      for (let alert of this.alerts) {
-        let endsAt = Date.parse(alert.endsAt);
-        if (now > endsAt) {
-          toDelete.push(alert);
-        }
-      }
-      for (let alert of toDelete) {
-        this.deleteOrderedAlert(alert);
-        this.deleteAlert(alert);
-      }
-    });
   }
 }
 

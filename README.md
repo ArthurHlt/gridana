@@ -45,8 +45,6 @@ inside `alertmanager-docker`, e.g.: `./alertmanager-docker/send-alerts --timeout
 - [x] Show all alerts aggregate by a probe and identifier as cards in an overlay
 - [x] Show all alerts on a side nav
 - [x] Options to see/hide silenced alert
-- [x] Js cron to remove expired alert which has been silenced on alerting system 
-(alertmanager doesn't send that alert has been silenced, other driver could do the same)
 - [x] Push notification (on ui and OS/browser notification system) when receiving a firing alert 
 (Potentially, have an option to see when they are resolved too)
 - [x] Silence alert from ui if driver support it.
