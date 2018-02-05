@@ -21,6 +21,7 @@ import {ConfigService} from "./config.service";
 import {SilenceComponent} from './silence/silence.component';
 import {AddPipe, DateFormatPipe, MomentModule} from 'angular2-moment';
 import {FormsModule} from '@angular/forms';
+import {RootComponent} from "./root.component";
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import {FormsModule} from '@angular/forms';
     LabelsComponent,
     ProbeComponent,
     ConfigComponent,
-    SilenceComponent
+    SilenceComponent,
+    RootComponent
   ],
   imports: [
     BrowserModule,

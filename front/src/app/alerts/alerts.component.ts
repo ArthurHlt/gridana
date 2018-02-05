@@ -51,11 +51,14 @@ export class AlertsComponent implements OnInit {
     this.getOrderedAlerts();
     this.getProbes();
     this.wsAlert.observable.subscribe((event: MessageEvent) => {
-      let alert = JSON.parse(event.data);
-      this.pushNotification(alert);
-      this.updateAlert(alert);
-      this.updateOrderedAlert(alert);
-    });
+        let alert = JSON.parse(event.data);
+        this.pushAlertNotification(alert);
+        this.updateAlert(alert);
+        this.updateOrderedAlert(alert);
+      },
+      () => {
+        this.pushNotification("Websocket lost connection", "Connection has been lost, please refresh page.")
+      });
   }
 
   getFirstAlert(identifier: string, probe: string): Alert {
@@ -147,7 +150,21 @@ export class AlertsComponent implements OnInit {
     });
   }
 
-  pushNotification(alert: Alert) {
+  pushNotification(title: string, body: string) {
+    let notif = this.browserNotifSvc.create(
+      title,
+      {body: body}
+    );
+    notif.subscribe(
+      res => {
+      },
+      err => {
+        this.notifService.alert(title, body);
+      }
+    );
+  }
+
+  pushAlertNotification(alert: Alert) {
     let alertExists = this.alertExists(alert);
     if (alertExists && !this.pushOnResolved) {
       return

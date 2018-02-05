@@ -5,7 +5,7 @@ cwd=`pwd`
 
 cd "$current/../front"
 npm install
-ng build --output-path ../dist
+ng build --prod --output-path ../dist
 cd "../"
 
 
