@@ -2,8 +2,6 @@ package gridana
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/ArthurHlt/gridana/emitter"
 	"github.com/ArthurHlt/gridana/model"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -49,7 +47,6 @@ func (api API) Register(r *mux.Router) {
 	r.HandleFunc("/webhook/{driver}", api.webhook).Methods("POST")
 }
 func (api API) notify(w http.ResponseWriter, req *http.Request) {
-	fmt.Println(fmt.Sprintf("Listeners: %d", len(emitter.Listeners())))
 	entry := log.WithField("verb", "notify")
 	c, err := api.upgrader.Upgrade(w, req, nil)
 	if err != nil {

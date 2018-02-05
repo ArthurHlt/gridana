@@ -4,6 +4,7 @@ current=`dirname $0`
 cwd=`pwd`
 
 cd "$current/../front"
+npm install
 ng build --output-path ../dist
 cd "../"
 

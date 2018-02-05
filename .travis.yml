@@ -9,6 +9,9 @@ install:
 script: go test -v ./... -args -ginkgo.randomizeAllSpecs -ginkgo.trace
 after_success:
 - GIT_TAG="$TRAVIS_TAG" bin/build-all
+- cd dist
+- zip ../out/ui.zip ./*
+- cd ..
 deploy:
   provider: releases
   api_key:
@@ -24,6 +27,7 @@ deploy:
   - out/gridana_linux_amd64.zip
   - out/gridana_windows_386.zip
   - out/gridana_windows_amd64.zip
+  - out/ui.zip
   skip_cleanup: true
   on:
     tags: true
