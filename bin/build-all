@@ -24,14 +24,14 @@ function build {
 
   cd ${CWD}
   echo "building gridana (${os} ${arch})..."
-  GOARCH=${arch} GOOS=${os} go build -tags ui -ldflags "-X main.version=$version" -o $OUTDIR/${BINARYNAME}_${os}_${arch}${ext} github.com/ArthurHlt/gridana/server/... || {
+  GOARCH=${arch} GOOS=${os} go build -tags ui -ldflags "-X main.version=$version" -o $OUTDIR/${BINARYNAME} github.com/ArthurHlt/gridana/server/... || {
     echo >&2 "error: while building gridana (${os} ${arch})"
     return 1
   }
 
   echo "zipping gridana (${os} ${arch})..."
   cd $OUTDIR
-  zip "${BINARYNAME}_${os}_${arch}.zip" "${BINARYNAME}_${os}_${arch}${ext}" || {
+  zip "${BINARYNAME}_${os}_${arch}.zip" "${BINARYNAME}" || {
     echo >&2 "error: cannot zip file ${BINARYNAME}_${os}_${arch}${ext}"
     return 1
   }
