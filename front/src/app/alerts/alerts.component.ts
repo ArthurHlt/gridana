@@ -18,7 +18,6 @@ import {Observable} from "rxjs/Rx";
 })
 export class AlertsComponent implements OnInit {
   @ViewChild(CardAlertsComponent) cardAlerts: CardAlertsComponent;
-  selectedAlert: Alert;
   alerts: Alert[];
   probes: Probe[];
   pushOnResolved: boolean;
@@ -49,7 +48,6 @@ export class AlertsComponent implements OnInit {
   ngOnInit() {
     this.browserNotifSvc.requestPermission();
     this.purgeAlertsCron();
-    this.getAlerts();
     this.getOrderedAlerts();
     this.getProbes();
     this.wsAlert.observable.subscribe((event: MessageEvent) => {
@@ -232,10 +230,6 @@ export class AlertsComponent implements OnInit {
     }
   }
 
-  onSelect(alert: Alert): void {
-    this.selectedAlert = alert;
-  }
-
   hasShowableAlerts(identifier: string): boolean {
     if (!this.orderedAlerts.alerts[identifier]) {
       return false;
@@ -267,11 +261,6 @@ export class AlertsComponent implements OnInit {
     return false;
   }
 
-  getAlerts(): void {
-    this.alertService.getAlerts()
-      .subscribe(alerts => this.alerts = alerts);
-  }
-
   getProbes(): void {
     this.alertService.getProbes()
       .subscribe(probes => this.probes = probes);
@@ -279,7 +268,19 @@ export class AlertsComponent implements OnInit {
 
   getOrderedAlerts(): void {
     this.alertService.getOrderedAlerts()
-      .subscribe(orderedAlerts => this.orderedAlerts = orderedAlerts);
+      .subscribe(orderedAlerts => {
+        this.orderedAlerts = orderedAlerts;
+        let identifiers = this.orderedAlerts.alerts;
+        for (let identifier in identifiers) {
+          let probes = this.orderedAlerts.alerts[identifier];
+          for (let probe in probes) {
+            let alerts = this.orderedAlerts.alerts[identifier][probe];
+            for (let alert of alerts) {
+              this.addAlert(alert);
+            }
+          }
+        }
+      });
   }
 
   purgeAlertsCron(): void {
