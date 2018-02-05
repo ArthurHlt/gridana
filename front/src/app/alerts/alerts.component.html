@@ -54,7 +54,7 @@
           <app-probe class="left floating-probe" zindex="3000" [alert]="alert"></app-probe>
           {{alert.name}}
         </div>
-        <p [innerHTML]="alert.message"></p>
+        <p class="content" [innerHTML]="alert.message"></p>
       </div>
       <div class="card-action" *ngIf="alert.status == 'silenced'">
         <ul class="info">

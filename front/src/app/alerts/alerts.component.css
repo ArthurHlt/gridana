@@ -36,10 +36,6 @@ table tr th:last-child {
     text-align: center;
 }
 
-th.identifier {
-    width: 250px;
-}
-
 th.probe {
     height: 107px;
     white-space: nowrap;
@@ -94,7 +90,8 @@ th.probe > div > span {
 .card-action .info li {
     margin-right: 10px;
     padding: 0;
-    float: left;
+    display: inline-block;
+    vertical-align: top;
 }
 
 .card .header-info {
@@ -108,7 +105,7 @@ th.probe > div > span {
     margin-right: 6px;
 }
 
-#alert-nav .card .card-content p {
+#alert-nav .card .card-content p.content {
     max-height: 100px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }

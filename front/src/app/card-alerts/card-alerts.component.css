@@ -47,7 +47,8 @@
 .card-action .info li {
     margin-right: 10px;
     padding: 0;
-    float: left;
+    display: inline-block;
+    vertical-align: top;
 }
 
 .card-container .card {
@@ -70,9 +71,9 @@
     margin: 5px;
 }
 
-.card-container .card .card-content p {
+.card-container .card .card-content p.content {
     height: 150px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .details-container {
@@ -96,7 +97,10 @@
 .details .card-content {
     margin-bottom: 30px;
     max-height: 80%;
-    overflow-y: scroll;
+}
+
+.details .card-content p.content {
+    overflow-y: auto;
 }
 
 .card-action i {

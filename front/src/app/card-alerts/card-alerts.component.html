@@ -12,7 +12,7 @@
           <app-probe class="left floating-probe" [alert]="alert"></app-probe>
           {{alert.name}}
         </div>
-        <p [innerHTML]="alert.message"></p>
+        <p class="content" [innerHTML]="alert.message"></p>
       </div>
       <div class="card-action">
         <div class="row">
@@ -45,7 +45,7 @@
           <app-probe class="left floating-probe" [alert]="selectAlert"></app-probe>
           {{selectAlert.name}}
         </div>
-        <p [innerHTML]="selectAlert.message"></p>
+        <p class="content" [innerHTML]="selectAlert.message"></p>
       </div>
       <div class="card-action" *ngIf="selectAlert.status == 'silenced'">
         <ul class="info">
