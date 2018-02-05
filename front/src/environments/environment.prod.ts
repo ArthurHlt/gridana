@@ -10,6 +10,7 @@ export const environment = {
     if (loc.protocol === "https:") {
       scheme = "wss:";
     }
-    return scheme + "//" + loc.host + loc.pathname + "/notify";
+
+    return scheme + "//" + loc.host + "/notify";
   }()
 };
