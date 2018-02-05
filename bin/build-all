@@ -24,7 +24,7 @@ function build {
 
   cd ${CWD}
   echo "building gridana (${os} ${arch})..."
-  GOARCH=${arch} GOOS=${os} go build -tags ui -ldflags "-X main.version=$version" -o $OUTDIR/${BINARYNAME}_${os}_${arch}${ext} || {
+  GOARCH=${arch} GOOS=${os} go build -tags ui -ldflags "-X main.version=$version" -o $OUTDIR/${BINARYNAME}_${os}_${arch}${ext} github.com/ArthurHlt/gridana/server/... || {
     echo >&2 "error: while building gridana (${os} ${arch})"
     return 1
   }
