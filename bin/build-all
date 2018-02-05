@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#!/bin/bash
+
+set -e
+
+BASE=$(dirname $0)
+OUTDIR=${BASE}/../out
+BINARYNAME=gridana
+CWD=$(pwd)
+current=`dirname $0`
+
+"$BASE/build-ui"
+default_version="$(date -u +.%Y%m%d.%H%M%S)-build"
+version="${GIT_TAG:-"$default_version"}"
+
+function build {
+  local arch=$1; shift
+  local os=$1; shift
+  local ext=""
+
+  if [ "${os}" == "windows" ]; then
+      ext=".exe"
+  fi
+
+  cd ${CWD}
+  echo "building gridana (${os} ${arch})..."
+  GOARCH=${arch} GOOS=${os} go build -ldflags "-X main.version=$version" -o $OUTDIR/${BINARYNAME}_${os}_${arch}${ext} || {
+    echo >&2 "error: while building gridana (${os} ${arch})"
+    return 1
+  }
+
+  echo "zipping gridana (${os} ${arch})..."
+  cd $OUTDIR
+  zip "${BINARYNAME}_${os}_${arch}.zip" "${BINARYNAME}_${os}_${arch}${ext}" || {
+    echo >&2 "error: cannot zip file ${BINARYNAME}_${os}_${arch}${ext}"
+    return 1
+  }
+  cd ${CWD}
+}
+
+build amd64 windows
+build 386   windows
+build amd64 linux
+build 386   linux
+build amd64 darwin

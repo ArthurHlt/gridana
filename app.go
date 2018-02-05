@@ -10,17 +10,25 @@ import (
 	"github.com/urfave/cli"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type App struct {
-	config *model.GridanaConfig
+	config  *model.GridanaConfig
+	version string
 }
 
 func NewApp() *App {
-	return &App{}
+	return NewAppWithVersion(time.Now().Format(time.RFC3339) + "-build")
+}
+func NewAppWithVersion(version string) *App {
+	return &App{
+		version: version,
+	}
 }
 func (a App) Run(args []string) {
 	app := cli.NewApp()
+	app.Version = a.version
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config-path, c",
