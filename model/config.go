@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	defaultSilenceColor = "blue"
-	defaultColor        = "red"
+	defaultColor = "red"
 )
 
 type GridanaConfig struct {
@@ -17,7 +16,6 @@ type GridanaConfig struct {
 	DropLabels    LabelMatcher   `yaml:"drop_labels"`
 	ColorByLabels ColorByLabels  `yaml:"color_by_labels"`
 	Logs          Logs           `yaml:"logs"`
-	SilenceColor  string         `yaml:"silence_color"`
 	DefaultColor  string         `yaml:"default_color"`
 	ListenAddr    string         `yaml:"listen_addr"`
 	Drivers       []DriverConfig `yaml:"drivers"`
@@ -43,9 +41,6 @@ func (c *GridanaConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	if len(strings.Split(c.ListenAddr, ":")) < 2 {
 		c.ListenAddr += ":" + port
-	}
-	if c.SilenceColor == "" {
-		c.SilenceColor = defaultSilenceColor
 	}
 	if c.DefaultColor == "" {
 		c.DefaultColor = defaultColor

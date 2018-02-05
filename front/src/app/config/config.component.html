@@ -1,0 +1,18 @@
+<form style="padding: 3px;" class="col s12">
+  <div class="row">
+    <div class="switch col s6">
+      <label>
+        Show silenced
+        <input type="checkbox" [checked]="showSilenced" (change)="showSilenced = !showSilenced">
+        <span class="lever"></span>
+      </label>
+    </div>
+    <div class="switch col s6">
+      <label>
+        Receive resolved
+        <input type="checkbox" [checked]="pushOnResolved" (change)="pushOnResolved = !pushOnResolved">
+        <span class="lever"></span>
+      </label>
+    </div>
+  </div>
+</form>

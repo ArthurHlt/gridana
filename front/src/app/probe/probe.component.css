@@ -1,0 +1,15 @@
+.circle {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 15px;
+}
+
+.circle i {
+    position: relative;
+    font-size: 20px;
+    line-height: 18px;
+}

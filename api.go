@@ -1,15 +1,20 @@
 package gridana
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/ArthurHlt/gridana/emitter"
 	"github.com/ArthurHlt/gridana/model"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	resp "github.com/nicklaw5/go-respond"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"sort"
+	"time"
 )
 
 type API struct {
@@ -30,52 +35,111 @@ func NewApi(processor *Processor, upgrader websocket.Upgrader, probes model.Prob
 }
 
 func (api API) Register(r *mux.Router) {
+	corsHandler := cors.AllowAll()
 	s := r.PathPrefix("/v1").Subrouter()
 	s.HandleFunc("/probes", api.listProbes).Methods("GET")
 	s.HandleFunc("/alerts", api.listAlerts).Methods("GET")
 	s.HandleFunc("/alerts/ordered", api.listOrderedAlerts).Methods("GET")
+	s.HandleFunc("/silence", api.silence).Methods("POST", "PUT", "OPTIONS")
+	s.Use(handlers.CompressHandler)
+	s.Use(corsHandler.Handler)
+	s.Use(panicHandler)
 
 	r.HandleFunc("/notify", api.notify)
 	r.HandleFunc("/webhook/{driver}", api.webhook).Methods("POST")
 }
 func (api API) notify(w http.ResponseWriter, req *http.Request) {
+	fmt.Println(fmt.Sprintf("Listeners: %d", len(emitter.Listeners())))
 	entry := log.WithField("verb", "notify")
 	c, err := api.upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		entry.Error(err)
 		return
 	}
-
 	entry = entry.WithField("user_addr", c.RemoteAddr())
 	entry.Debug("User connected.")
+	closeWrite := make(chan bool)
 	defer func() {
 		entry.Debug("User disconnected.")
 		c.Close()
+		closeWrite <- true
 	}()
-	// TODO: add mechanism to release disconnected client from socket
-	// for now they will be released only when events have been received which can be long
-	for event := range emitter.On() {
-		alert := emitter.ToAlert(event)
-		err := c.WriteJSON(alert)
-		if err != nil {
-			entry.Debug(err)
-			break
-		}
-		entry.Debug("Event sent to client")
-	}
-
+	go notifyWriter(c, closeWrite)
+	notifyReader(c)
 }
 func (api API) webhook(w http.ResponseWriter, req *http.Request) {
 	driver := mux.Vars(req)["driver"]
-	entry := log.WithField("verb", "webhook").WithField("driver", driver)
 	defer req.Body.Close()
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		entry.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+		panic(HttpError{
+			Verb:    "webhook",
+			Details: err.Error(),
+			Status:  http.StatusInternalServerError,
+		})
 	}
 	api.processor.ReceiveAlerts(driver, data)
+}
+
+func (api API) silence(w http.ResponseWriter, req *http.Request) {
+	defer req.Body.Close()
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		panic(HttpError{
+			Verb:    "silence",
+			Details: err.Error(),
+			Status:  http.StatusInternalServerError,
+		})
+	}
+	var fmtAlert model.FormattedAlert
+	err = json.Unmarshal(data, &fmtAlert)
+	if err != nil {
+		panic(HttpError{
+			Verb:    "silence",
+			Details: err.Error(),
+			Status:  http.StatusInternalServerError,
+		})
+	}
+	if fmtAlert.Silence.CreatedBy == "" {
+		panic(HttpError{
+			Verb:    "silence",
+			Details: "User must be set",
+			Status:  http.StatusBadRequest,
+		})
+	}
+	if fmtAlert.Silence.Reason == "" {
+		panic(HttpError{
+			Verb:    "silence",
+			Details: "Reason must be set",
+			Status:  http.StatusBadRequest,
+		})
+	}
+	if fmtAlert.Silence.EndsAt.Before(fmtAlert.Silence.StartsAt) {
+		panic(HttpError{
+			Verb:    "silence",
+			Details: "end time can't be before start at",
+			Status:  http.StatusBadRequest,
+		})
+	}
+	if fmtAlert.Silence.EndsAt.Before(time.Now()) {
+		panic(HttpError{
+			Verb:    "silence",
+			Details: "end time can't be in the past",
+			Status:  http.StatusBadRequest,
+		})
+	}
+
+	for _, driverName := range api.driversName {
+		err = api.processor.SilenceAlert(driverName, fmtAlert.Alert)
+		if err != nil {
+			panic(HttpError{
+				Verb:    "silence",
+				Details: err.Error(),
+				Status:  http.StatusInternalServerError,
+			})
+		}
+	}
+	resp.NewResponse(w).Ok(fmtAlert)
 }
 
 func (api API) listOrderedAlerts(w http.ResponseWriter, req *http.Request) {

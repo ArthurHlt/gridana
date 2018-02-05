@@ -10,6 +10,7 @@ probes:
 
 route:
   probe: aprobe
+  template: "{{.Labels.service}}"
 
 color_by_labels:
 - color: yellow

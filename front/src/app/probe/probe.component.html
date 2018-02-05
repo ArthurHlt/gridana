@@ -1,0 +1,7 @@
+<ng-container *ngIf="alert">
+  <span class="circle grey-text" [ngClass]="{'pulse': !isSilenced()}" [style.background]="alert.color" [style.z-index]="zindex">
+    <i *ngIf="isSilenced()" class="material-icons">notifications_paused</i>
+    <span *ngIf="!isSilenced()">&nbsp;</span>
+  </span>
+</ng-container>
+<span class="grey-text" *ngIf="!alert">-</span>

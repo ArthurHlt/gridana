@@ -55,7 +55,25 @@ func (p Processor) RetrieveAlerts() []model.FormattedAlert {
 	log.Debug("Finished processing alerts.")
 	return fmtAlerts
 }
-
+func (p Processor) SilenceAlert(driverName string, alert model.Alert) error {
+	entry := log.WithField("driver_name", driverName)
+	entry.Debug("Silencing alert ...")
+	if _, ok := p.drivers[driverName]; !ok {
+		entry.Warning("Can't find this driver, skipping.")
+		return nil
+	}
+	if _, ok := p.drivers[driverName].(drivers.DriverSilencer); !ok {
+		entry.Warning("This driver doesn't implement silencer, skipping.")
+		return nil
+	}
+	driver := p.drivers[driverName].(drivers.DriverSilencer)
+	err := driver.Silence(alert)
+	if err != nil {
+		return err
+	}
+	entry.Debug("Finished silencing alert.")
+	return nil
+}
 func (p Processor) ReceiveAlerts(driverName string, data []byte) {
 	entry := log.WithField("driver_name", driverName)
 	entry.Debug("Receiving alerts ...")

@@ -13,4 +13,14 @@ export class Alert {
   probe: string;
   identifier: string;
   weight: number;
+  notification: string;
+  silence: Silence;
+}
+
+class Silence {
+  id: string;
+  createdBy: string;
+  reason: string;
+  startsAt: string;
+  endsAt: string;
 }

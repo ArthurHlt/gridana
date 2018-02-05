@@ -10,18 +10,35 @@ import {Alert} from "../alert";
 export class CardAlertsComponent implements OnInit {
 
   alerts: Alert[];
+  selectAlert: Alert;
   show: boolean;
   scale: boolean;
+  silenceSection: boolean;
 
   constructor() {
+    this.alerts = [];
   }
 
-  static stopPropagation(event) {
+  stopPropagation(event) {
     event.stopPropagation();
   }
 
-  toggle() {
+  showAlerts(alerts: Alert[]) {
+    this.selectAlert = null;
+    this.alerts = alerts;
+    this.toggle()
 
+  }
+
+  toggle() {
+    if (this.selectAlert && this.alerts.length > 0) {
+      this.scale = false;
+      setTimeout(() => {
+        this.selectAlert = null;
+        this.scale = true;
+      }, 200);
+      return
+    }
     let willShow = !this.show;
     if (!willShow) {
       this.scale = false;
@@ -35,6 +52,46 @@ export class CardAlertsComponent implements OnInit {
       this.scale = true;
     }, 50);
 
+  }
+
+  showDetailsFromCards(alert: Alert, event) {
+    event.stopPropagation();
+    this.silenceSection = false;
+    this.scale = false;
+    setTimeout(() => {
+      this.selectAlert = alert;
+      this.scale = true;
+    }, 200);
+  }
+
+  showSilenceFromCards(alert: Alert, event) {
+    event.stopPropagation();
+    this.scale = false;
+    setTimeout(() => {
+      this.selectAlert = alert;
+      this.silenceSection = true;
+      this.scale = true;
+    }, 200);
+  }
+  showSilenceFromDetails(alert: Alert) {
+    this.scale = false;
+    setTimeout(() => {
+      this.silenceSection = true;
+      this.scale = true;
+    }, 200);
+  }
+  showDetails(alert: Alert) {
+    this.silenceSection = false;
+    this.alerts = [];
+    this.selectAlert = alert;
+    this.toggle();
+  }
+
+  showSilence(alert: Alert) {
+    this.silenceSection = true;
+    this.alerts = [];
+    this.selectAlert = alert;
+    this.toggle();
   }
 
   ngOnInit() {

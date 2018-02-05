@@ -9,7 +9,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
-    z-index: 1000; /* Specify a stack order in case you're using a different order for other elements */
+    z-index: 2000; /* Specify a stack order in case you're using a different order for other elements */
     cursor: pointer; /* Add a pointer on hover */
 }
 
@@ -32,8 +32,73 @@
     align-content: flex-end;
 }
 
-.card {
+.card-action .info {
+    list-style: none;
+    height: 15px;
+    color: white;
+}
+
+.card-action .info .badge {
+    float: none;
+    color: white;
+    margin-left: 0;
+}
+
+.card-action .info li {
+    margin-right: 10px;
+    padding: 0;
+    float: left;
+}
+
+.card-container .card {
     cursor: auto;
-    width: 250px;
+    width: 290px;
     margin: 5px;
+}
+
+.card-container .card .row {
+    margin-bottom: 0;
+}
+
+.card-container .card .col {
+    padding: 0;
+}
+
+.card .header-info {
+    font-size: 0.7em;
+    color: white;
+    margin: 5px;
+}
+
+.card-container .card .card-content p {
+    height: 150px;
+    overflow-y: scroll;
+}
+
+.details-container {
+    min-height: 100%;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+}
+
+.details {
+    cursor: auto;
+    width: 80%;
+}
+
+.details .card-content {
+    margin-bottom: 30px;
+    max-height: 80%;
+    overflow-y: scroll;
+}
+
+.card-action i {
+    font-size: 12px;
 }

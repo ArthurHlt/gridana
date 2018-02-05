@@ -3,16 +3,6 @@ table.center {
     margin-left: auto;
 }
 
-.circle {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    /* width and height can be anything, as long as they're equal */
-}
-
 table {
     width: auto;
 }
@@ -69,4 +59,56 @@ th.probe > div > span {
     border-top: 1px solid #d0d0d0;
     padding: 2px 22px;
     width: 75px;
+}
+
+#alert-nav li {
+    line-height: normal;
+    margin-bottom: 20px;
+}
+
+.details {
+    cursor: auto;
+    width: 80%;
+}
+
+.details .card-content {
+    min-height: 500px;
+}
+
+.card-action i {
+    font-size: 12px;
+}
+
+.card-action .info {
+    list-style: none;
+    height: 15px;
+    color: white;
+}
+
+.card-action .info .badge {
+    float: none;
+    color: white;
+    margin-left: 0;
+}
+
+.card-action .info li {
+    margin-right: 10px;
+    padding: 0;
+    float: left;
+}
+
+.card .header-info {
+    font-size: 0.7em;
+    color: white;
+    margin: 5px;
+}
+
+#alert-nav .card .card-title .circle {
+    margin-top: 4px;
+    margin-right: 6px;
+}
+
+#alert-nav .card .card-content p {
+    max-height: 100px;
+    overflow-y: scroll;
 }

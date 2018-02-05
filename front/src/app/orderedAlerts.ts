@@ -1,4 +1,6 @@
+import {Alert} from "./alert";
+
 export class OrderedAlerts {
-  alerts: any;
+  alerts: Map<string, Map<string, Alert[]>>;
   identifiers: string[];
 }

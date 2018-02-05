@@ -31,18 +31,29 @@ type Alert struct {
 	Status       alertStatus `json:"status"`
 	Labels       KV          `json:"labels"`
 	Annotations  KV          `json:"annotations"`
+	Silence      Silence     `json:"silence"`
 }
+
+type Silence struct {
+	ID        string    `json:"id"`
+	CreatedBy string    `json:"createdBy"`
+	Reason    string    `json:"reason"`
+	StartsAt  time.Time `json:"startsAt"`
+	EndsAt    time.Time `json:"endsAt"`
+}
+
 type AlertsByProbe map[string][]FormattedAlert
 
 type OrderedAlerts map[string]AlertsByProbe
 
 type FormattedAlert struct {
 	Alert
-	Color      string `json:"color"`
-	Message    string `json:"message"`
-	Probe      string `json:"probe"`
-	Identifier string `json:"identifier"`
-	Weight     int    `json:"weight"`
+	Color        string `json:"color"`
+	Message      string `json:"message"`
+	Probe        string `json:"probe"`
+	Identifier   string `json:"identifier"`
+	Notification string `json:"notification"`
+	Weight       int    `json:"weight"`
 }
 
 func (a FormattedAlerts) Len() int {

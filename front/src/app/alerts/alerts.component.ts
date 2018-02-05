@@ -1,9 +1,15 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnInit, ViewChild} from '@angular/core';
 import {Alert} from '../alert';
 import {AlertService} from '../alert.service';
 import {OrderedAlerts} from "../orderedAlerts";
 import {WsAlertService} from "../ws-alert.service";
 import {Probe} from "../probe";
+import {NotificationsService} from "angular2-notifications";
+import {CardAlertsComponent} from "../card-alerts/card-alerts.component";
+import {PushNotificationsService} from "ng-push";
+import {capitalizeFirstLetter} from "../utils";
+import {ConfigService} from "../config.service";
+import {Observable} from "rxjs/Rx";
 
 @Component({
   selector: 'app-alerts',
@@ -11,47 +17,87 @@ import {Probe} from "../probe";
   styleUrls: ['./alerts.component.css']
 })
 export class AlertsComponent implements OnInit {
+  @ViewChild(CardAlertsComponent) cardAlerts: CardAlertsComponent;
   selectedAlert: Alert;
   alerts: Alert[];
   probes: Probe[];
+  pushOnResolved: boolean;
   orderedAlerts: OrderedAlerts;
+  showSilenced: boolean;
+  notifOptions = {
+    position: ["top", "right"],
+    timeOut: 5000,
+    lastOnBottom: true,
+    showProgressBar: true,
+    pauseOnHover: true,
+    clickToClose: false,
+    clickIconToClose: true
+  };
 
-
-  constructor(private alertService: AlertService, private wsAlert: WsAlertService) {
+  constructor(private alertService: AlertService,
+              private wsAlert: WsAlertService,
+              private notifService: NotificationsService,
+              private browserNotifSvc: PushNotificationsService,
+              private zone: NgZone,
+              private configService: ConfigService) {
+    this.alerts = [];
+    configService.defineShowSilenced(this, 'showSilenced');
+    configService.defineReceiveResolved(this, 'pushOnResolved');
   }
 
+
   ngOnInit() {
+    this.browserNotifSvc.requestPermission();
+    this.purgeAlertsCron();
     this.getAlerts();
     this.getOrderedAlerts();
     this.getProbes();
     this.wsAlert.observable.subscribe((event: MessageEvent) => {
       let alert = JSON.parse(event.data);
-      console.log(alert);
-      this.addAlert(alert);
+      this.pushNotification(alert);
+      this.updateAlert(alert);
       this.updateOrderedAlert(alert);
     });
   }
 
-  getColor(identifier: string, probe: string): string {
+  getFirstAlert(identifier: string, probe: string): Alert {
     if (!this.orderedAlerts.alerts[identifier]) {
-      return ""
+      return null
     }
     if (this.orderedAlerts.alerts[identifier][probe].length == 0) {
-      return ""
+      return null
     }
-    let color = this.orderedAlerts.alerts[identifier][probe][0].color
-    if (color == "yellow") {
-      color = "#ffeb3b"
-    }
-    return color
+
+    return this.orderedAlerts.alerts[identifier][probe][0];
   }
 
+  getGroupAlerts(identifier: string, probe: string): Alert[] {
+    if (!this.orderedAlerts.alerts[identifier]) {
+      return []
+    }
+    if (this.orderedAlerts.alerts[identifier][probe].length == 0) {
+      return []
+    }
+    return this.orderedAlerts.alerts[identifier][probe]
+  }
 
   addAlert(alert: Alert) {
     if (this.alertExists(alert)) {
       return
     }
     this.alerts.unshift(alert);
+  }
+
+  deleteAlert(alert: Alert) {
+    if (!this.alertExists(alert)) {
+      return
+    }
+    for (let i = 0; i < this.alerts.length; i++) {
+      if (this.alerts[i].id == alert.id) {
+        this.alerts.splice(i, 1);
+        break;
+      }
+    }
   }
 
   alertExists(alert: Alert): boolean {
@@ -67,7 +113,7 @@ export class AlertsComponent implements OnInit {
     if (!this.orderedAlerts.alerts[alert.identifier]) {
       return -1
     }
-    let alerts = this.orderedAlerts.alerts[alert.identifier][alert.probe]
+    let alerts = this.orderedAlerts.alerts[alert.identifier][alert.probe];
     if (alerts.length == 0) {
       return -1
     }
@@ -80,12 +126,54 @@ export class AlertsComponent implements OnInit {
     return -1
   }
 
+  updateAlert(alert: Alert) {
+    if (alert.status == "resolved") {
+      this.deleteAlert(alert);
+      return
+    }
+    this.addAlert(alert);
+  }
+
   updateOrderedAlert(alert: Alert) {
     if (alert.status == "resolved") {
       this.deleteOrderedAlert(alert);
       return
     }
     this.addOrderedAlert(alert);
+  }
+
+  pushSiteNotification(alert: Alert) {
+    let notif = this.notifService.alert(capitalizeFirstLetter(alert.status), alert.notification);
+    notif.click.subscribe((event) => {
+      this.cardAlerts.showDetails(alert);
+    });
+  }
+
+  pushNotification(alert: Alert) {
+    let alertExists = this.alertExists(alert);
+    if (alertExists && !this.pushOnResolved) {
+      return
+    }
+    if (alertExists && alert.status != "resolved") {
+      return
+    }
+    let notif = this.browserNotifSvc.create(
+      capitalizeFirstLetter(alert.status),
+      {body: alert.notification}
+    );
+    notif.subscribe(
+      res => {
+        if (res.event.type === 'click') {
+          this.zone.run(() => {
+            res.notification.close();
+            this.cardAlerts.showDetails(alert);
+          });
+        }
+      },
+      err => {
+        this.pushSiteNotification(alert);
+      }
+    );
   }
 
   addOrderedAlert(alert: Alert) {
@@ -96,7 +184,7 @@ export class AlertsComponent implements OnInit {
     }
     if (this.orderedAlerts.alerts[alert.identifier]) {
       let alerts = this.orderedAlerts.alerts[alert.identifier][alert.probe];
-      for (let i = 0; i < alerts; i++) {
+      for (let i = 0; i < alerts.length; i++) {
         if (alert.weight >= alerts[i].weight) {
           this.orderedAlerts.alerts[alert.identifier][alert.probe].splice(i, 0, alert);
           return
@@ -148,6 +236,37 @@ export class AlertsComponent implements OnInit {
     this.selectedAlert = alert;
   }
 
+  hasShowableAlerts(identifier: string): boolean {
+    if (!this.orderedAlerts.alerts[identifier]) {
+      return false;
+    }
+    let count = 0;
+    let probes = this.orderedAlerts.alerts[identifier];
+    for (let probe in probes) {
+      let alerts = this.orderedAlerts.alerts[identifier][probe];
+      for (let alert of alerts) {
+        if (alert.status == "silenced" && !this.showSilenced) {
+          continue;
+        }
+        count++;
+      }
+    }
+    return count > 0;
+  }
+
+  gridShowable(): boolean {
+    if (!this.orderedAlerts) {
+      return false;
+    }
+    let ids = this.orderedAlerts.identifiers;
+    for (let id of ids) {
+      if (this.hasShowableAlerts(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   getAlerts(): void {
     this.alertService.getAlerts()
       .subscribe(alerts => this.alerts = alerts);
@@ -161,6 +280,23 @@ export class AlertsComponent implements OnInit {
   getOrderedAlerts(): void {
     this.alertService.getOrderedAlerts()
       .subscribe(orderedAlerts => this.orderedAlerts = orderedAlerts);
+  }
+
+  purgeAlertsCron(): void {
+    Observable.interval(2000 * 60).subscribe(x => {
+      let toDelete: Alert[] = [];
+      let now = Date.now();
+      for (let alert of this.alerts) {
+        let endsAt = Date.parse(alert.endsAt);
+        if (now > endsAt) {
+          toDelete.push(alert);
+        }
+      }
+      for (let alert of toDelete) {
+        this.deleteOrderedAlert(alert);
+        this.deleteAlert(alert);
+      }
+    });
   }
 }
 

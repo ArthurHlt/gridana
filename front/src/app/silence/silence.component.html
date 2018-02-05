@@ -1,0 +1,60 @@
+<div class="card-content white-text">
+  <div class="card-title">
+    Silencing {{alert.name}}
+  </div>
+  <form style="padding: 3px;" class="col s12" #silenceForm="ngForm">
+    <div class="row" *ngIf="error">
+      <ul class="collection">
+        <li class="collection-item red darken-4">{{error}}</li>
+      </ul>
+    </div>
+    <div class="row" *ngIf="success">
+      <ul class="collection">
+        <li class="collection-item green darken-4">Alert has been silenced</li>
+      </ul>
+    </div>
+    <div class="row">
+      <div class="input-field col s5">
+        <input id="start" name="start" type="text" required [(ngModel)]="startAt" class="validate">
+        <label class="active" for="start">Start</label>
+      </div>
+      <div class="input-field col s2">
+        <input id="duration" name="duration" type="text" class="validate"
+               required
+               [(ngModel)]="durationRaw"
+               (blur)="parseDuration()">
+        <label class="active" for="duration">Duration</label>
+      </div>
+      <div class="input-field col s5">
+        <input id="end" name="end" type="text" class="validate"
+               required
+               [(ngModel)]="endsAt">
+        <label class="active" for="end">End</label>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="creator" name="creator" type="text" class="validate"
+                 required
+                 [(ngModel)]="createdBy">
+          <label for="creator">Creator</label>
+        </div>
+        <div class="input-field col s12">
+          <textarea id="reason" name="reason" type="text" class="materialize-textarea validate"
+                    required
+                    [(ngModel)]="reason"></textarea>
+          <label for="reason">Reason</label>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+<div class="card-action">
+  <app-labels [labels]="alert.labels"></app-labels>
+</div>
+<div class="card-action">
+  <button class="waves-effect waves-light btn blue" [disabled]="!silenceForm.form.valid" (click)="createSilence()">
+    Create
+  </button>
+  <button class="waves-effect waves-light btn red darken-4" (click)="cancel()">Cancel</button>
+</div>

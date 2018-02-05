@@ -1,138 +1,88 @@
 <div class="overlay" *ngIf="show" (click)="toggle()">
-  <ul class="card-container">
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
+  <ul class="card-container" *ngIf="!selectAlert">
+    <li class="card hoverable blue-grey darken-1 scale-transition"
+        (click)="stopPropagation($event)"
+        [ngClass]="{'scale-in': scale, 'scale-out': !scale}"
+        *ngFor="let alert of alerts"
+    >
+      <div class="left header-info">{{alert.status}}</div>
+      <div class="right date header-info">{{alert.startsAt | date:'yyyy-MM-dd, HH:mm:ss'}}</div>
       <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
+        <div class="card-title">
+          <app-probe class="left floating-probe" [alert]="alert"></app-probe>
+          {{alert.name}}
+        </div>
+        <p [innerHTML]="alert.message"></p>
       </div>
       <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
+        <div class="row">
+          <div class="switch col s6">
+            <a href="#" (click)="showDetailsFromCards(alert, $event)">Details</a>
+          </div>
+          <div class="switch col s6">
+            <a href="#" (click)="showSilenceFromCards(alert, $event)">Silence</a>
+          </div>
+        </div>
       </div>
       <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
-      </div>
-    </li>
-    <li class="card hoverable blue-grey darken-1 scale-transition" (click)="stopPropagation($event)" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
-      <div class="card-content white-text">
-        <span class="card-title">Card Title</span>
-        <p>I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
-      <div class="card-action">
-        <a href="#">This is a link</a>
-        <a href="#">This is a link</a>
+        <div class="row">
+          <div class="switch col s6">
+            <a [attr.href]="alert.generatorURL" target="_blank"><i class="material-icons">exit_to_app</i>generator</a>
+          </div>
+          <div class="switch col s6">
+            <a [attr.href]="alert.notifierURL" target="_blank"><i class="material-icons">exit_to_app</i>notifier</a>
+          </div>
+        </div>
       </div>
     </li>
   </ul>
+  <div *ngIf="selectAlert && !silenceSection" class="details-container">
+    <div (click)="stopPropagation($event)" class="details card blue-grey darken-1 scale-transition" [ngClass]="{'scale-in': scale, 'scale-out': !scale}">
+      <div class="left header-info">{{selectAlert.status}}</div>
+      <div class="right date header-info">{{selectAlert.startsAt | date:'yyyy-MM-dd, HH:mm:ss'}}</div>
+      <div class="card-content white-text">
+        <div class="card-title">
+          <app-probe class="left floating-probe" [alert]="selectAlert"></app-probe>
+          {{selectAlert.name}}
+        </div>
+        <p [innerHTML]="selectAlert.message"></p>
+      </div>
+      <div class="card-action" *ngIf="selectAlert.status == 'silenced'">
+        <ul class="info">
+          <li><strong>Silence by</strong>: <span class="badge grey">{{selectAlert.silence.createdBy}}</span></li>
+          <li><strong>Expire at</strong>:
+            <span class="badge grey">{{selectAlert.silence.endsAt | date:'yyyy-MM-dd, HH:mm:ss'}}</span></li>
+          <li><strong>Reason</strong>: <span class="badge grey">{{selectAlert.silence.reason}}</span></li>
+        </ul>
+      </div>
+      <div class="card-action">
+        <ul class="info">
+          <li><strong>Identifier</strong>: <span class="badge grey">{{selectAlert.identifier}}</span></li>
+          <li><strong>Probe</strong>: <span class="badge grey">{{selectAlert.probe}}</span></li>
+          <li><strong>Expire at</strong>:
+            <span class="badge grey">{{selectAlert.endsAt | date:'yyyy-MM-dd, HH:mm:ss'}}</span></li>
+        </ul>
+      </div>
+      <div class="card-action">
+        <app-labels [labels]="selectAlert.labels"></app-labels>
+      </div>
+      <div class="card-action">
+        <a href="#" (click)="toggle()">Close</a>
+        <a href="#" (click)="showSilenceFromDetails(alert)">Silence</a>
+        <a [attr.href]="selectAlert.generatorURL" target="_blank"><i class="material-icons">exit_to_app</i>
+          generator</a>
+        <a [attr.href]="selectAlert.notifierURL" target="_blank"><i class="material-icons">exit_to_app</i> notifier</a>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="selectAlert && silenceSection" class="details-container">
+    <app-silence [alert]="selectAlert"
+                 (click)="stopPropagation($event)"
+                 (close)="toggle()"
+                 class="details card blue-grey darken-1 scale-transition"
+                 [ngClass]="{'scale-in': scale, 'scale-out': !scale}"
 
+    >
+    </app-silence>
+  </div>
 </div>

@@ -6,7 +6,6 @@ import (
 	"github.com/ArthurHlt/gridana/model"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"net/http"
@@ -50,9 +49,8 @@ func (a App) start(c *cli.Context) error {
 	r.NewRoute().Handler(http.FileServer(assetFS()))
 	log.WithField("listen_addr", a.config.ListenAddr).
 		Info("Server started and listening.")
-	corsHandler := cors.AllowAll()
 
-	return http.ListenAndServe(a.config.ListenAddr, corsHandler.Handler(r))
+	return http.ListenAndServe(a.config.ListenAddr, r)
 }
 func (a App) bootstrapApi(d map[string]drivers.Driver) *API {
 	driversName := make([]string, 0)
@@ -73,7 +71,7 @@ func (a App) bootstrapProcessor(d map[string]drivers.Driver) *Processor {
 }
 
 func (a App) bootstrapConverter() converters.Converter {
-	return converters.NewAlertConverter(a.config.Route, a.config.Probes, a.config.ColorByLabels, a.config.DefaultColor, a.config.SilenceColor)
+	return converters.NewAlertConverter(a.config.Route, a.config.Probes, a.config.ColorByLabels, a.config.DefaultColor)
 }
 
 func (a App) bootstrapDrivers() (map[string]drivers.Driver, error) {

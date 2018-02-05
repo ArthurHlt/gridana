@@ -6,6 +6,7 @@
 export const environment = {
   production: false,
   alertsUrl: "http://localhost:8080/v1/alerts",
+  silenceUrl: "http://localhost:8080/v1/silence",
   probesUrl: "http://localhost:8080/v1/probes",
   alertsOrderedUrl: "http://localhost:8080/v1/alerts/ordered",
   wsUrl: "ws://localhost:8080/notify"

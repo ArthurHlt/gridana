@@ -11,22 +11,42 @@ import {AppComponent} from './app.component';
 import {WsAlertService} from './ws-alert.service';
 import {AlertsComponent} from './alerts/alerts.component';
 import {CardAlertsComponent} from './card-alerts/card-alerts.component';
+import {LabelsComponent} from './labels/labels.component';
+import {PushNotificationsModule} from "ng-push";
+import {mainRoutingProviders, routing} from "./main.route";
+import {ProbeComponent} from './probe/probe.component';
+import {PersistenceModule} from "angular-persistence";
+import {ConfigComponent} from './config/config.component';
+import {ConfigService} from "./config.service";
+import {SilenceComponent} from './silence/silence.component';
+import {AddPipe, DateFormatPipe, MomentModule} from 'angular2-moment';
+import {FormsModule} from '@angular/forms';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     AlertsComponent,
-    CardAlertsComponent
+    CardAlertsComponent,
+    LabelsComponent,
+    ProbeComponent,
+    ConfigComponent,
+    SilenceComponent
   ],
   imports: [
     BrowserModule,
+    PersistenceModule,
+    FormsModule,
+    MomentModule,
     HttpClientModule,
     BrowserAnimationsModule,
     MaterializeModule,
-    SimpleNotificationsModule.forRoot()
+    mainRoutingProviders,
+    SimpleNotificationsModule.forRoot(),
+    PushNotificationsModule,
+    routing
   ],
-  providers: [AlertService, WsAlertService],
+  providers: [AlertService, WsAlertService, ConfigService, DateFormatPipe, AddPipe],
   bootstrap: [AppComponent]
 })
 export class AppModule {

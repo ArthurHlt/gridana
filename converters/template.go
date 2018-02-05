@@ -3,15 +3,15 @@ package converters
 import (
 	"bytes"
 	"github.com/ArthurHlt/gridana/model"
+	"gopkg.in/russross/blackfriday.v2"
 	tmplhtml "html/template"
 	"regexp"
 	"strings"
 	tmpltext "text/template"
 	"time"
-	"gopkg.in/russross/blackfriday.v2"
 )
 
-func GenAlertMessage(alert model.Alert, layout string) (string, error) {
+func GenHTML(alert model.FormattedAlert, layout string) (string, error) {
 	tmpl, err := tmpltext.New("").
 		Option("missingkey=zero").
 		Funcs(tmpltext.FuncMap(DefaultFuncs)).
@@ -27,7 +27,7 @@ func GenAlertMessage(alert model.Alert, layout string) (string, error) {
 	return string(blackfriday.Run(b.Bytes())), nil
 }
 
-func GenAlertIdentifier(alert model.Alert, layout string) (string, error) {
+func GenText(alert model.FormattedAlert, layout string) (string, error) {
 	tmpl, err := tmpltext.New("").
 		Option("missingkey=zero").
 		Funcs(tmpltext.FuncMap(DefaultFuncs)).

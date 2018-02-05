@@ -2,9 +2,10 @@
   <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">{{ title }}</a>
     <ul class="right hide-on-med-and-down">
       <li>
-        <a href="#">
+        <a href="#" materialize="dropdown" [materializeParams]="[{constrainWidth:false, stopPropagation: true}]" data-alignment="right" data-beloworigin="true" data-activates='config'>
           <i class="large material-icons">settings</i>
         </a>
+        <app-config id='config' class='dropdown-content' (click)="stopPropagation($event)"></app-config>
       </li>
       <li>
         <a href="#" materialize="sideNav" [materializeParams]="[{edge:'right', menuWidth:'650'}]" data-activates="alert-nav">
@@ -16,17 +17,7 @@
   </div>
 </nav>
 
-<div class="container">
-  <app-alerts></app-alerts>
-  <!--<ul>-->
-  <!--<li *ngFor="let alert of alerts">{{alert.id}}-->
-  <!--<div [innerHTML]="alert.message"></div>-->
-  <!--</li>-->
-  <!--</ul>-->
-  <!--<ul>-->
-  <!--<li *ngFor="let identifier of orderedAlerts?.identifiers">{{identifier}}</li>-->
-  <!--</ul>-->
-  <br><br>
-</div>
+<app-alerts></app-alerts>
+
 
 

@@ -12,6 +12,10 @@ export class AppComponent {
   constructor(private wsAlert: WsAlertService) {
   }
 
+  stopPropagation(event) {
+    event.stopPropagation();
+  }
+
   ngOnInit() {
   }
 }

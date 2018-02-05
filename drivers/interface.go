@@ -10,3 +10,7 @@ type Driver interface {
 type DriverNotifier interface {
 	ReceiveAlerts(data []byte) ([]model.Alert, error)
 }
+
+type DriverSilencer interface {
+	Silence(alert model.Alert) error
+}
