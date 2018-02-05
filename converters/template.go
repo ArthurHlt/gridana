@@ -40,7 +40,9 @@ func GenText(alert model.FormattedAlert, layout string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.Replace(b.String(), "\n", " ", -1), nil
+	text := strings.Replace(b.String(), "\n", "", -1)
+	text = strings.Replace(text, " ", "", -1)
+	return text, nil
 }
 
 type FuncMap map[string]interface{}

@@ -6,11 +6,23 @@ drivers:
 
 probes:
 - name: VmInfo
+  template:
+    message: "{{ .Annotations.description }}"
 - name: BoshHealth
+  template:
+    message: "{{ .Annotations.description }}"
 - name: CfHealth
+  template:
+    message: "{{ .Annotations.description }}"
 - name: CfApp
+  template:
+    message: "{{ .Annotations.description }}"
 - name: Scrap
+  template:
+    message: "{{ .Annotations.description }}"
 - name: HttpProbe
+  template:
+    message: "{{ .Annotations.description }}"
 
 drop_labels:
   require_all: false
