@@ -83,10 +83,12 @@ export class AlertsComponent implements OnInit {
   }
 
   addAlert(alert: Alert) {
-    if (this.alertExists(alert)) {
+    let alertPos = this.alertPos(alert);
+    if (alertPos < 0) {
+      this.alerts.unshift(alert);
       return
     }
-    this.alerts.unshift(alert);
+    this.alerts[alertPos] = alert;
   }
 
   deleteAlert(alert: Alert) {
@@ -99,6 +101,15 @@ export class AlertsComponent implements OnInit {
         break;
       }
     }
+  }
+
+  alertPos(alert: Alert): number {
+    for (let i = 0; i < this.alerts.length; i++) {
+      if (alert.id == this.alerts[i].id) {
+        return i
+      }
+    }
+    return -1
   }
 
   alertExists(alert: Alert): boolean {
