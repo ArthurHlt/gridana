@@ -39,7 +39,5 @@ function build {
 }
 
 build amd64 windows
-build 386   windows
 build amd64 linux
-build 386   linux
 build amd64 darwin

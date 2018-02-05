@@ -18,14 +18,10 @@ deploy:
     secure: i3kKf5swhrmTu3xxK6DJi9Aob5pCdgk8vHU/PeI8EX+uGPldCA/UitSskuioqf4qmQNXCie17BSxAAR0egXJ/4nWyg28Izf7p441zPFIYEjtb2tFekxkIevEcVI6GUd92H/HrR0PEijwp11lOwhr/7U6m6nYeJgRkwyf2e+8N80rrj9F/6ur2zgYOnPRnEy+qqRnz5pHlzLKoEEnp9eRBMgX6NPgyyXxzB6IlfO69+MR+QTYIBvL3UHZsHBqzpa2TW1fLe7nwGF2+Liw3SxBFziYQ/9FqcwP6e50aItfXhiA+SK4k78LpRrk///XkZLBj8q1S4BP0V3xn3YPmwDyyTJYH1oxhOaEtvWW73Lwq7axpm9qnIpVZ0d2TnfVloJsm35x3LV7OCPZCFI8gzzFD2cSzVsdf11uB6oeD9izvhNYlZyI0n+S11j+hHZa8Op8xIUb55Clop59SewIhq1+sfYHrtFLE9LkSkd0sqOJ5ah/iXGr9eCU+uQTQ90e7TcUvPLHENI5YkO0iil653WDm2zfsIUksLy7ryY6JZz/fFwgwn0zkwHWpDkck9JIuUJx8A9/Pa3bl1nd0CJuTQepwOYkCrwi0chrCGY4dBuvVX5dItausC+9/NQEhVjQkIFfdSvjTM02O4VGL6ymVorVejnC1xmSHnoL1QEtwnOe+xU=
   file:
   - out/gridana_darwin_amd64
-  - out/gridana_linux_386
   - out/gridana_linux_amd64
-  - out/gridana_windows_386.exe
   - out/gridana_windows_amd64.exe
   - out/gridana_darwin_amd64.zip
-  - out/gridana_linux_386.zip
   - out/gridana_linux_amd64.zip
-  - out/gridana_windows_386.zip
   - out/gridana_windows_amd64.zip
   - out/ui.zip
   skip_cleanup: true
