@@ -235,11 +235,14 @@ export class AlertsComponent implements OnInit {
     if (!this.orderedAlerts.alerts[alert.identifier]) {
       return
     }
+    if (!this.orderedAlerts.alerts[alert.identifier][alert.probe]) {
+      return
+    }
     let alerts = this.orderedAlerts.alerts[alert.identifier][alert.probe];
     if (alerts.length == 0) {
       return
     }
-    for (let i = 0; i < this.alerts.length; i++) {
+    for (let i = 0; i < alerts.length; i++) {
       if (alerts[i].id == alert.id) {
         this.orderedAlerts.alerts[alert.identifier][alert.probe].splice(i, 1);
         break;
