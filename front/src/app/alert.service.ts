@@ -5,10 +5,10 @@ import {Observable} from 'rxjs/Observable';
 
 import {Alert} from './alert';
 import {OrderedAlerts} from './orderedAlerts';
-import {Probe} from "./probe";
+import {Probe} from './probe';
 
 import {environment} from '../environments/environment';
-import {catchError} from "rxjs/operators";
+import {catchError} from 'rxjs/operators';
 
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})

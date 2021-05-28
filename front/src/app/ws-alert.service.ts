@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core'
-import 'rxjs/add/operator/share'
+import {Injectable} from '@angular/core';
+import 'rxjs/add/operator/share';
 import {Observable} from 'rxjs/Observable';
-import {Observer} from "rxjs/Observer";
-import * as Sockette from "sockette/dist/sockette";
+import {Observer} from 'rxjs/Observer';
+import * as Sockette from 'sockette/dist/sockette';
 
 
 import {environment} from '../environments/environment';
@@ -13,14 +13,14 @@ export class WsAlertService {
   public observable: Observable<MessageEvent>;
 
   constructor() {
-    let url = environment.wsUrl;
+    const url = environment.wsUrl;
     this.observable = this.create(url);
-    console.log("Successfully connected: " + url);
+    console.log('Successfully connected: ' + url);
   }
 
   private create(url): Observable<MessageEvent> {
     console.log(Sockette);
-    let ws = new Sockette(url);
+    const ws = new Sockette(url);
 
     return Observable.create(
       (obs: Observer<MessageEvent>) => {
