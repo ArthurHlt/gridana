@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Alert} from "../alert";
+import {Alert} from '../alert';
 
 @Component({
   selector: 'app-probe',
@@ -11,13 +11,13 @@ export class ProbeComponent implements OnInit {
   @Input() zindex: string;
 
   constructor() {
-    this.zindex = "auto";
+    this.zindex = 'auto';
   }
 
   ngOnInit() {
   }
 
   isSilenced(): boolean {
-    return this.alert.status == "silenced";
+    return this.alert.status === 'silenced';
   }
 }

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Alert} from "../alert";
-import {AddPipe, DateFormatPipe} from "angular2-moment";
-import {AlertService} from "../alert.service";
+import {Alert} from '../alert';
+import {AddPipe, DateFormatPipe} from 'ngx-moment';
+import {AlertService} from '../alert.service';
 
 @Component({
   selector: 'app-silence',
@@ -36,11 +36,11 @@ export class SilenceComponent implements OnInit {
   }
 
   parseDuration() {
-    let reg = new RegExp('^([1-9]+)([A-Za-z]+)$');
+    const reg = new RegExp('^([1-9]+)([A-Za-z]+)$');
     if (!reg.test(this.durationRaw)) {
-      return
+      return;
     }
-    let match = reg.exec(this.durationRaw);
+    const match = reg.exec(this.durationRaw);
     this.durationNumber = Number(match[1]);
     this.durationType = match[2];
     this.endsAt = this.dateFormatPipe.transform(this.addPipe.transform(this.startAt, this.durationNumber, this.durationType));
@@ -52,22 +52,22 @@ export class SilenceComponent implements OnInit {
     this.alert.silence.reason = this.reason;
     this.alert.silence.startsAt = this.startAt;
     this.alert.silence.endsAt = this.endsAt;
-    this.alert.status = "silenced";
+    this.alert.status = 'silenced';
     this.alertService.setSilence(this.alert).subscribe(
       data => {
         this.success = true;
         setTimeout(() => {
-          this.close.emit("closing");
-        }, 500)
+          this.close.emit('closing');
+        }, 500);
       },
       err => {
         console.log(err.error);
-        this.error = err.error.title + ": " + err.error.details;
+        this.error = err.error.title + ': ' + err.error.details;
       }
     );
   }
 
   cancel() {
-    this.close.emit("closing");
+    this.close.emit('closing');
   }
 }

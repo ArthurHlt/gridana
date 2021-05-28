@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Alert} from "../alert";
+import {Alert} from '../alert';
 
 
 @Component({
@@ -26,7 +26,7 @@ export class CardAlertsComponent implements OnInit {
   showAlerts(alerts: Alert[]) {
     this.selectAlert = null;
     this.alerts = alerts;
-    this.toggle()
+    this.toggle();
 
   }
 
@@ -37,15 +37,15 @@ export class CardAlertsComponent implements OnInit {
         this.selectAlert = null;
         this.scale = true;
       }, 200);
-      return
+      return;
     }
-    let willShow = !this.show;
+    const willShow = !this.show;
     if (!willShow) {
       this.scale = false;
       setTimeout(() => {
         this.show = willShow;
       }, 200);
-      return
+      return;
     }
     this.show = willShow;
     setTimeout(() => {
@@ -73,6 +73,7 @@ export class CardAlertsComponent implements OnInit {
       this.scale = true;
     }, 200);
   }
+
   showSilenceFromDetails(alert: Alert) {
     this.scale = false;
     setTimeout(() => {
@@ -80,6 +81,7 @@ export class CardAlertsComponent implements OnInit {
       this.scale = true;
     }, 200);
   }
+
   showDetails(alert: Alert) {
     this.silenceSection = false;
     this.alerts = [];

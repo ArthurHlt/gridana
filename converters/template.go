@@ -3,7 +3,7 @@ package converters
 import (
 	"bytes"
 	"github.com/ArthurHlt/gridana/model"
-	"gopkg.in/russross/blackfriday.v2"
+	"github.com/russross/blackfriday/v2"
 	tmplhtml "html/template"
 	"regexp"
 	"strings"

@@ -1,14 +1,18 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	promodel "github.com/prometheus/common/model"
+)
 
 type DriverConfig struct {
-	Name               string `yaml:"name" json:"name"`
-	URL                string `yaml:"url" json:"url"`
-	User               string `yaml:"user" json:"user"`
-	Password           string `yaml:"password" json:"password"`
-	InsecureSkipVerify bool   `yaml:"insecure_skip_verify" json:"insecure_skip_verify"`
-	Type               string `yaml:"type" json:"type"`
+	Name               string             `yaml:"name" json:"name"`
+	URL                string             `yaml:"url" json:"url"`
+	User               string             `yaml:"user" json:"user"`
+	Password           string             `yaml:"password" json:"password"`
+	InsecureSkipVerify bool               `yaml:"insecure_skip_verify" json:"insecure_skip_verify"`
+	Type               string             `yaml:"type" json:"type"`
+	PeriodicRetrieve   *promodel.Duration `yaml:"periodic_retrieve" json:"periodic_retrieve"`
 	// Catches all undefined fields and must be empty after parsing.
 	XXX map[string]interface{} `yaml:",inline"`
 }

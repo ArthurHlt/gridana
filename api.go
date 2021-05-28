@@ -46,6 +46,7 @@ func (api API) Register(r *mux.Router) {
 	r.HandleFunc("/notify", api.notify)
 	r.HandleFunc("/webhook/{driver}", api.webhook).Methods("POST")
 }
+
 func (api API) notify(w http.ResponseWriter, req *http.Request) {
 	entry := log.WithField("verb", "notify")
 	c, err := api.upgrader.Upgrade(w, req, nil)
@@ -64,6 +65,7 @@ func (api API) notify(w http.ResponseWriter, req *http.Request) {
 	go notifyWriter(c, closeWrite)
 	notifyReader(c)
 }
+
 func (api API) webhook(w http.ResponseWriter, req *http.Request) {
 	driver := mux.Vars(req)["driver"]
 	defer req.Body.Close()

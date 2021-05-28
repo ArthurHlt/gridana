@@ -1,97 +1,108 @@
 no_check_origin: true
 drivers:
-- name: alertmanager-beta
-  url: https://prometheus-alertmanager.run.beta.cfy.s0.hbx.geo.francetelecom.fr
-  type: alertmanager
+  - name: alertmanager-beta
+    url: https://alertmanager.cf.sph.hbx.geo.francetelecom.fr
+    type: alertmanager
 
 probes:
-- name: VmInfo
-  template:
-    message: "{{ .Annotations.description }}"
-- name: BoshHealth
-  template:
-    message: "{{ .Annotations.description }}"
-- name: CfHealth
-  template:
-    message: "{{ .Annotations.description }}"
-- name: CfApp
-  template:
-    message: "{{ .Annotations.description }}"
-- name: Scrap
-  template:
-    message: "{{ .Annotations.description }}"
-- name: HttpProbe
-  template:
-    message: "{{ .Annotations.description }}"
+  - name: VmInfo
+    template:
+      message: "{{ .Annotations.description }}"
+  - name: BoshHealth
+    template:
+      message: "{{ .Annotations.description }}"
+  - name: CfHealth
+    template:
+      message: "{{ .Annotations.description }}"
+  - name: CfApp
+    template:
+      message: "{{ .Annotations.description }}"
+  - name: Scrap
+    template:
+      message: "{{ .Annotations.description }}"
+  - name: HttpProbe
+    template:
+      message: "{{ .Annotations.description }}"
+  - name: Scaling
+    template:
+      message: "{{ .Annotations.description }}"
 
 drop_labels:
   require_all: false
   match_re:
-    bosh_deployment: ["mysql.*", "redis.*"]
+    bosh_deployment: [ "mysql.*", "redis.*" ]
 
 route:
   probe: no-probe
   routes:
-  - label_matcher:
-      match:
-        service: "probe"
-    probe: HttpProbe
-    template: "{{ .Labels.instance }}"
+    - label_matcher:
+        match:
+          service: "probe"
+      probe: HttpProbe
+      template: "{{.Labels.site}}/{{ .Labels.instance }}"
 
-  # Exporter and prometheus system alert routing
-  # Exporter error or prometheus itself alerts are relocated to correct host
-  - label_matcher:
-      match_re:
-        service: ["prometheus"]
-    template: "prometheus/{{.Labels.instance}}"
-    probe: Scrap
+    # Exporter and prometheus system alert routing
+    # Exporter error or prometheus itself alerts are relocated to correct host
+    - label_matcher:
+        match_re:
+          service: [ "prometheus" ]
+      template: "{{.Labels.site}}/prometheus/{{.Labels.instance}}"
+      probe: Scrap
 
-  - probe: BoshHealth
-    template: "{{.Labels.environment}}/{{.Labels.bosh_name}}{{with .Labels.bosh_deployment}}/{{.}}{{end}}{{with .Labels.instance}}/{{.}}{{end}}{{with .Labels.bosh_job_name}}/{{.}}{{end}}{{with .Labels.bosh_job_index}}/{{.}}{{end}}"
-    label_matcher:
-      match_re:
-        service: ["bosh.*"]
-    routes:
-    - probe: Scrap
+    - probe: BoshHealth
+      template: "{{.Labels.site}}/{{.Labels.environment}}/{{.Labels.bosh_name}}{{with .Labels.bosh_deployment}}/{{.}}{{end}}{{with .Labels.instance}}/{{.}}{{end}}{{with .Labels.bosh_job_name}}/{{.}}{{end}}{{with .Labels.bosh_job_index}}/{{.}}{{end}}"
       label_matcher:
         match_re:
-          service: [".*-exporter"]
-      template: "{{.Labels.environment}}/{{.Labels.bosh_name}}/{{.Labels.instance}}"
-    - probe: VmInfo
-      label_matcher:
-        match_re:
-          __name__:
-          - "BOSHJobEphemeralDiskFull"
-          - "BOSHJobEphemeralDiskPredictWillFill"
-          - "BOSHJobHighCPULoad"
-          - "BOSHJobLowFreeRAM"
-          - "BOSHJobLowSwap"
-          - "BOSHJobPersistentDiskFull"
-          - "BOSHJobPersistentDiskInodesExhausted"
-          - "BOSHJobPersistentDiskPredictWillFill"
+          service: [ "bosh.*", "diego-cell.*" ]
+      routes:
+        - probe: Scrap
+          label_matcher:
+            match_re:
+              service: [ ".*-exporter" ]
+          template: "{{.Labels.environment}}/{{.Labels.bosh_name}}/{{.Labels.instance}}"
+        - probe: VmInfo
+          template: "{{.Labels.site}}/{{.Labels.environment}}/{{.Labels.bosh_name}}{{with .Labels.bosh_deployment}}/{{.}}{{end}}{{with .Labels.instance}}/{{.}}{{end}}{{with .Labels.bosh_job_name}}/{{.}}{{end}}{{with .Labels.bosh_job_index}}/{{.}}{{end}}"
+          label_matcher:
+            match_re:
+              __name__:
+                - "BOSHJobEphemeralDiskFull"
+                - "BOSHJobEphemeralDiskPredictWillFill"
+                - "BOSHJobHighCPULoad"
+                - "BOSHJobLowFreeRAM"
+                - "BOSHJobLowSwap"
+                - "BOSHJobPersistentDiskFull"
+                - "BOSHJobPersistentDiskInodesExhausted"
+                - "BOSHJobPersistentDiskPredictWillFill"
+                - "DiegoCellJobHighCPULoad"
 
-  - probe: CfHealth
-    template: "{{.Labels.environment}}/{{.Labels.bosh_deployment}}"
-    label_matcher:
-      match_re:
-        service: ["cf.*"]
-    routes:
-    - probe: Scrap
+    - probe: Scaling
+      template: "{{.Labels.site}}/{{.Labels.environment}}/{{.Labels.bosh_name}}{{with .Labels.bosh_deployment}}/{{.}}{{end}}{{with .Labels.instance}}/{{.}}{{end}}{{with .Labels.bosh_job_name}}/{{.}}{{end}}{{with .Labels.bosh_job_index}}/{{.}}{{end}}"
       label_matcher:
         match_re:
-          service: [".*-exporter"]
-      template: "{{.Labels.environment}}/{{.Labels.deployment}}/{{.Labels.instance}}"
-    - probe: CfApp
-      template: "{{.Labels.environment}}/{{.Labels.deployment}}/{{.Labels.organization_name}}/{{.Labels.space_name}}/{{.Labels.application_name}}"
+          __name__: [ "(?i).*scaling.*" ]
+
+    - probe: CfHealth
+      template: "{{.Labels.site}}/{{.Labels.environment}}/{{.Labels.bosh_deployment}}"
       label_matcher:
         match_re:
-          application_name: [".*"]
+          service: [ "cf.*" ]
+      routes:
+        - probe: Scrap
+          label_matcher:
+            match_re:
+              service: [ ".*-exporter" ]
+          template: "{{.Labels.site}}/{{.Labels.environment}}/{{.Labels.deployment}}/{{.Labels.instance}}"
+        - probe: CfApp
+          template: "{{.Labels.site}}/{{.Labels.environment}}/{{.Labels.deployment}}/{{.Labels.organization_name}}/{{.Labels.space_name}}/{{.Labels.application_name}}"
+          label_matcher:
+            match_re:
+              application_name: [ ".*" ]
 
 color_by_labels:
-- color: yellow
-  weight: 5 # weight permit to to take the lead on other, default weight is 10
-  label_matcher:
-    match_re:
-      severity: [".*warn.*"]
+  - color: yellow
+    weight: 5 # weight permit to to take the lead on other, default weight is 10
+    label_matcher:
+      match_re:
+        severity: [ ".*warn.*" ]
 logs:
   level: debug

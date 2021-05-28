@@ -35,6 +35,7 @@ func notifyReader(c *websocket.Conn) {
 		}
 	}
 }
+
 func notifyWriter(c *websocket.Conn, close <-chan bool) {
 	entry := log.WithField("user_addr", c.RemoteAddr())
 	pingTicker := time.NewTicker(pingPeriod)

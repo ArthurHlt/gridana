@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {PersistenceService, StorageType} from "angular-persistence";
+import {PersistenceService, StorageType} from 'angular-persistence';
 
 @Injectable()
 export class ConfigService {
@@ -9,10 +9,10 @@ export class ConfigService {
   }
 
   defineShowSilenced(obj: any, propName: string) {
-    this.persistenceService.defineProperty(obj, propName, "show_silenced", {type: StorageType.LOCAL});
+    this.persistenceService.defineProperty(obj, propName, 'show_silenced', {type: StorageType.LOCAL});
   }
 
   defineReceiveResolved(obj: any, propName: string) {
-    this.persistenceService.defineProperty(obj, propName, "receive_resolved", {type: StorageType.LOCAL});
+    this.persistenceService.defineProperty(obj, propName, 'receive_resolved', {type: StorageType.LOCAL});
   }
 }

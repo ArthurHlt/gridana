@@ -25,15 +25,15 @@ func NewAlertConverter(
 	}
 }
 
-func (c AlertConverter) Convert(alert model.Alert) (model.FormattedAlert, error) {
+func (c AlertConverter) Convert(alert *model.Alert) (model.FormattedAlert, error) {
 	var err error
-	route := c.route.FindRoute(alert)
+	route := c.route.FindRoute(*alert)
 	probe := c.probes.FindProbe(route.Probe)
 	if probe == nil {
 		return model.FormattedAlert{}, ErrProbeNotFound
 	}
 
-	color, weight := c.colorByLabels.AlertColor(alert)
+	color, weight := c.colorByLabels.AlertColor(*alert)
 	if alert.Status == model.Ssilenced {
 		weight = -1
 	}

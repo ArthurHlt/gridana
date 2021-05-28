@@ -47,7 +47,7 @@ type AlertsByProbe map[string][]FormattedAlert
 type OrderedAlerts map[string]AlertsByProbe
 
 type FormattedAlert struct {
-	Alert
+	*Alert
 	Color        string `json:"color"`
 	Message      string `json:"message"`
 	Probe        string `json:"probe"`

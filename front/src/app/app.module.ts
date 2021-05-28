@@ -12,14 +12,14 @@ import {WsAlertService} from './ws-alert.service';
 import {AlertsComponent} from './alerts/alerts.component';
 import {CardAlertsComponent} from './card-alerts/card-alerts.component';
 import {LabelsComponent} from './labels/labels.component';
-import {PushNotificationsModule} from 'ng-push';
+import {PushNotificationsModule} from 'ng-push-ivy';
 import {mainRoutingProviders, routing} from './main.route';
 import {ProbeComponent} from './probe/probe.component';
 import {PersistenceModule} from 'angular-persistence';
 import {ConfigComponent} from './config/config.component';
 import {ConfigService} from './config.service';
 import {SilenceComponent} from './silence/silence.component';
-import {AddPipe, DateFormatPipe, MomentModule} from 'angular2-moment';
+import {AddPipe, DateFormatPipe, MomentModule} from 'ngx-moment';
 import {FormsModule} from '@angular/forms';
 import {RootComponent} from './root.component';
 

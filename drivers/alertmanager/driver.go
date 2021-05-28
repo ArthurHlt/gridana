@@ -8,11 +8,14 @@ import (
 	"github.com/ArthurHlt/gridana/model"
 	"github.com/ArthurHlt/gridana/utils"
 	promtpl "github.com/prometheus/alertmanager/template"
+	"github.com/prometheus/alertmanager/pkg/labels"
 	"github.com/prometheus/alertmanager/types"
-	"github.com/satori/go.uuid"
+	promodel "github.com/prometheus/common/model"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,18 +30,21 @@ const (
 	silenceRoute   = "/api/v1/silence/%s"
 	silencesRoute  = "/api/v1/silences"
 	alertNameLabel = "alertname"
-	NS_UUID        = "531f431c-70bf-4275-af81-f6571eeff06a"
 	stateActive    = "active"
 	stateSilenced  = "suppressed"
 )
 
 type Driver struct {
-	client *http.Client
-	amUrl  string
+	client   *http.Client
+	amUrl    string
+	cache    *sync.Map
+	periodic *promodel.Duration
 }
 
 func New() *Driver {
-	return &Driver{}
+	return &Driver{
+		cache: &sync.Map{},
+	}
 }
 
 type AmData struct {
@@ -53,6 +59,7 @@ type AmSilence struct {
 	StartsAt  time.Time `json:"startsAt"`
 	EndsAt    time.Time `json:"endsAt"`
 }
+
 type AmAlert struct {
 	Labels       model.KV
 	Annotations  model.KV
@@ -68,10 +75,10 @@ type AmAlert struct {
 	Fingerprint string   `json:"fingerprint"`
 }
 
-func (d Driver) toAlertFromRetrieve(amAlert AmAlert) (model.Alert, error) {
+func (d Driver) toAlertFromRetrieve(amAlert AmAlert) (*model.Alert, error) {
 	labels := amAlert.Labels
-	alert := model.Alert{
-		Name:         string(labels[alertNameLabel]),
+	alert := &model.Alert{
+		Name:         labels[alertNameLabel],
 		GeneratorURL: amAlert.GeneratorURL,
 		NotifierURL:  d.amUrl,
 		StartsAt:     amAlert.StartsAt,
@@ -80,7 +87,7 @@ func (d Driver) toAlertFromRetrieve(amAlert AmAlert) (model.Alert, error) {
 	}
 
 	alert.Labels = labels
-	alert.ID = d.generateAlertId(alert)
+	alert.ID = amAlert.Fingerprint
 	delete(labels, alertNameLabel)
 	alert.Labels = labels
 	if amAlert.Status.State == stateActive {
@@ -101,6 +108,7 @@ func (d Driver) toAlertFromRetrieve(amAlert AmAlert) (model.Alert, error) {
 	}
 	return alert, nil
 }
+
 func (d Driver) retrieveSilence(silenceID string) (AmSilence, error) {
 	silenceFRoute := fmt.Sprintf(silenceRoute, silenceID)
 	req, err := http.NewRequest("GET", d.amUrl+silenceFRoute, nil)
@@ -130,18 +138,19 @@ func (d Driver) retrieveSilence(silenceID string) (AmSilence, error) {
 	}
 	return data.Data, nil
 }
-func (d Driver) toAlertFromReceived(amAlert promtpl.Alert) model.Alert {
+
+func (d Driver) toAlertFromReceived(amAlert promtpl.Alert) *model.Alert {
 	labels := amAlert.Labels
-	alert := model.Alert{
+	alert := &model.Alert{
 		Name:         string(labels[alertNameLabel]),
 		GeneratorURL: amAlert.GeneratorURL,
 		NotifierURL:  d.amUrl,
 		StartsAt:     amAlert.StartsAt,
 		EndsAt:       amAlert.EndsAt,
 		Annotations:  model.KV(amAlert.Annotations),
+		ID:           amAlert.Fingerprint,
 	}
 	alert.Labels = model.KV(labels)
-	alert.ID = d.generateAlertId(alert)
 	delete(labels, alertNameLabel)
 	alert.Labels = model.KV(labels)
 
@@ -152,15 +161,9 @@ func (d Driver) toAlertFromReceived(amAlert promtpl.Alert) model.Alert {
 	}
 	return alert
 }
-func (d Driver) generateAlertId(alert model.Alert) string {
-	names := make([]string, len(alert.Labels))
-	for i, pair := range alert.Labels.SortedPairs() {
-		names[i] = fmt.Sprintf("%s=%s", pair.Name, pair.Value)
-	}
-	return uuid.NewV3(uuid.FromStringOrNil(NS_UUID), strings.Join(names, "-")).String()
-}
-func (d Driver) RetrieveAlerts() ([]model.Alert, error) {
-	alerts := make([]model.Alert, 0)
+
+func (d Driver) RetrieveAlerts() ([]*model.Alert, error) {
+	alerts := make([]*model.Alert, 0)
 	req, err := http.NewRequest("GET", d.amUrl+alertRoute, nil)
 	if err != nil {
 		return alerts, err
@@ -198,9 +201,9 @@ func (d Driver) RetrieveAlerts() ([]model.Alert, error) {
 	return alerts, nil
 }
 
-func (d Driver) ReceiveAlerts(data []byte) ([]model.Alert, error) {
+func (d Driver) ReceiveAlerts(data []byte) ([]*model.Alert, error) {
 
-	alerts := make([]model.Alert, 0)
+	alerts := make([]*model.Alert, 0)
 	var wAlerts promtpl.Data
 	err := json.Unmarshal(data, &wAlerts)
 	if err != nil {
@@ -211,12 +214,15 @@ func (d Driver) ReceiveAlerts(data []byte) ([]model.Alert, error) {
 	}
 	return alerts, nil
 }
+
 func (d *Driver) Config(config model.DriverConfig) error {
 	d.amUrl = strings.TrimSuffix(config.URL, "/")
 	d.client = utils.CreateClient(config)
+	d.periodic = config.PeriodicRetrieve
 	return nil
 }
-func (d Driver) Silence(alert model.Alert) error {
+
+func (d Driver) Silence(alert *model.Alert) error {
 	silence := types.Silence{
 		ID:        alert.Silence.ID,
 		Comment:   alert.Silence.Reason,
@@ -224,13 +230,13 @@ func (d Driver) Silence(alert model.Alert) error {
 		StartsAt:  alert.Silence.StartsAt,
 		EndsAt:    alert.Silence.EndsAt,
 	}
-	matchers := types.NewMatchers()
-	matchers = append(matchers, &types.Matcher{
+	matchers := make(labels.Matchers, 0)
+	matchers = append(matchers, &labels.Matcher{
 		Name:  alertNameLabel,
 		Value: alert.Name,
 	})
 	for key, value := range alert.Labels {
-		matchers = append(matchers, &types.Matcher{
+		matchers = append(matchers, &labels.Matcher{
 			Name:  key,
 			Value: value,
 		})
@@ -260,5 +266,55 @@ func (d Driver) Silence(alert model.Alert) error {
 	if resp.StatusCode >= 300 {
 		return fmt.Errorf("Error when retrieving alerts (status code %d): %s", resp.StatusCode, string(b))
 	}
+	return nil
+}
+
+func (d Driver) StartPeriodicAlerts(alertsChan chan<- []*model.Alert) error {
+	if d.periodic == nil {
+		return nil
+	}
+
+	go func() {
+		for {
+			toAdd := make([]*model.Alert, 0)
+			toDelete := make([]string, 0)
+
+			alerts, err := d.RetrieveAlerts()
+			if err != nil {
+				logrus.Error(err.Error())
+			}
+			for _, alert := range alerts {
+				_, ok := d.cache.Load(alert.ID)
+				if ok {
+					continue
+				}
+				toAdd = append(toAdd, alert)
+				d.cache.Store(alert.ID, alert)
+			}
+			d.cache.Range(func(key, value interface{}) bool {
+				exists := false
+				for _, alert := range alerts {
+					if alert.ID == key.(string) {
+						exists = true
+						break
+					}
+				}
+				if !exists {
+					toDelete = append(toDelete, key.(string))
+				}
+				return true
+			})
+
+			for _, key := range toDelete {
+				alertRaw, _ := d.cache.Load(key)
+				alert := alertRaw.(*model.Alert)
+				alert.Status = model.Sresolved
+				toAdd = append(toAdd, alert)
+				d.cache.Delete(key)
+			}
+			alertsChan <- toAdd
+			time.Sleep(time.Duration(*d.periodic))
+		}
+	}()
 	return nil
 }

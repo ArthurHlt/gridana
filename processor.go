@@ -24,7 +24,7 @@ func NewProcessor(drivers map[string]drivers.Driver, converter converters.Conver
 
 func (p Processor) RetrieveAlerts() []model.FormattedAlert {
 	log.Debug("Retrieving alerts ...")
-	alerts := make([]model.Alert, 0)
+	alerts := make([]*model.Alert, 0)
 	for name, driver := range p.drivers {
 		entry := log.WithField("driver_name", name)
 		entry.Debug("Retrieving alerts for driver ...")
@@ -41,7 +41,7 @@ func (p Processor) RetrieveAlerts() []model.FormattedAlert {
 	log.Debug("Processing alerts ...")
 	fmtAlerts := make([]model.FormattedAlert, 0)
 	for _, alert := range alerts {
-		if p.dropLabels.MatchAlert(alert) {
+		if p.dropLabels.MatchAlert(*alert) {
 			continue
 		}
 		entry := log.WithField("alert_id", alert.ID)
@@ -55,7 +55,38 @@ func (p Processor) RetrieveAlerts() []model.FormattedAlert {
 	log.Debug("Finished processing alerts.")
 	return fmtAlerts
 }
-func (p Processor) SilenceAlert(driverName string, alert model.Alert) error {
+
+func (p Processor) StartPeriodics() error {
+	alertsChan := make(chan []*model.Alert, 100)
+	for driverName, driver := range p.drivers {
+		entry := log.WithField("driver_name", driverName)
+
+		driverPeriodic, ok := driver.(drivers.DriverPeriodic)
+		if !ok {
+			entry.Warning("This driver doesn't implement periodic, skipping.")
+			continue
+		}
+		err := driverPeriodic.StartPeriodicAlerts(alertsChan)
+		if err != nil {
+			return err
+		}
+	}
+	go func(alertsChan <-chan []*model.Alert) {
+		for alerts := range alertsChan {
+			for _, alert := range alerts {
+				fmtAlert, err := p.converter.Convert(alert)
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+				emitter.Emit(fmtAlert)
+			}
+		}
+	}(alertsChan)
+	return nil
+}
+
+func (p Processor) SilenceAlert(driverName string, alert *model.Alert) error {
 	entry := log.WithField("driver_name", driverName)
 	entry.Debug("Silencing alert ...")
 	if _, ok := p.drivers[driverName]; !ok {
@@ -74,6 +105,7 @@ func (p Processor) SilenceAlert(driverName string, alert model.Alert) error {
 	entry.Debug("Finished silencing alert.")
 	return nil
 }
+
 func (p Processor) ReceiveAlerts(driverName string, data []byte) {
 	entry := log.WithField("driver_name", driverName)
 	entry.Debug("Receiving alerts ...")
@@ -95,7 +127,7 @@ func (p Processor) ReceiveAlerts(driverName string, data []byte) {
 
 	entry.Debug("Processing alerts ...")
 	for _, alert := range alerts {
-		if p.dropLabels.MatchAlert(alert) {
+		if p.dropLabels.MatchAlert(*alert) {
 			continue
 		}
 		entry := log.WithField("alert_id", alert.ID)

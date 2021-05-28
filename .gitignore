@@ -1,5 +1,7 @@
 /gridana
 /server/server
+/server/gridana
 /dist
 ui.go
 /output
+/config.yml

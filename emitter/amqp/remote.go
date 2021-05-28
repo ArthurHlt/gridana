@@ -49,6 +49,7 @@ func NewAmqpRemote(conn *amqp.Connection) (*AmqpRemote, error) {
 		msgChan: msgs,
 	}, nil
 }
+
 func (r AmqpRemote) Emit(alert model.FormattedAlert) {
 	entry := log.WithField("alert_id", alert.ID).
 		WithField("remote_emitter", "amqp").
@@ -70,6 +71,7 @@ func (r AmqpRemote) Emit(alert model.FormattedAlert) {
 		entry.Error(err)
 	}
 }
+
 func (r AmqpRemote) Receive(emit func(model.FormattedAlert)) {
 	entry := log.WithField("remote_emitter", "amqp").WithField("order", "receive")
 	go func() {

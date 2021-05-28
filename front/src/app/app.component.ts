@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {WsAlertService} from "./ws-alert.service";
+import {WsAlertService} from './ws-alert.service';
 
 @Component({
   selector: 'app-root',

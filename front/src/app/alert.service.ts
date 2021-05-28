@@ -1,7 +1,7 @@
+
+import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-
-import {Observable} from 'rxjs/Observable';
 
 import {Alert} from './alert';
 import {OrderedAlerts} from './orderedAlerts';
@@ -45,7 +45,7 @@ export class AlertService {
 
   private handleError<T>(result?: T) {
     return (error: any): Observable<T> => {
-      return Observable.throw(error);
+      return observableThrowError(error);
     };
   }
 }

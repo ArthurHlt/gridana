@@ -1,108 +1,115 @@
 .overlay {
-    position: fixed; /* Sit on top of the page content */
-    overflow-y: scroll;
-    display: block; /* Hidden by default */
-    min-height: 100%;
-    width: 100%; /* Full width (cover the whole page) */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
-    z-index: 2000; /* Specify a stack order in case you're using a different order for other elements */
-    cursor: pointer; /* Add a pointer on hover */
+  position: fixed; /* Sit on top of the page content */
+  overflow-y: scroll;
+  display: block; /* Hidden by default */
+  min-height: 100%;
+  width: 100%; /* Full width (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 2000; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
 }
 
 .card-container {
-    margin: 0;
-    padding: 0;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-align-items: center;
-    align-items: center;
-    -webkit-justify-content: center;
-    justify-content: center;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-    -webkit-flex-flow: row wrap;
-    flex-flow: row wrap;
-    -webkit-align-content: flex-end;
-    align-content: flex-end;
+  margin: 0;
+  padding: 0;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+  -webkit-align-content: flex-end;
+  align-content: flex-end;
 }
 
 .card-action .info {
-    list-style: none;
-    height: 15px;
-    color: white;
+  list-style: none;
+  height: 15px;
+  color: white;
 }
 
 .card-action .info .badge {
-    float: none;
-    color: white;
-    margin-left: 0;
+  float: none;
+  color: white;
+  margin-left: 0;
 }
 
 .card-action .info li {
-    margin-right: 10px;
-    padding: 0;
-    display: inline-block;
-    vertical-align: top;
+  margin-right: 10px;
+  padding: 0;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .card-container .card {
-    cursor: auto;
-    width: 290px;
-    margin: 5px;
+  cursor: auto;
+  width: 400px;
+  margin: 5px;
 }
 
 .card-container .card .row {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .card-container .card .col {
-    padding: 0;
+  padding: 0;
 }
 
 .card .header-info {
-    font-size: 0.7em;
-    color: white;
-    margin: 5px;
+  font-size: 0.7em;
+  color: white;
+  margin: 5px;
 }
 
 .card-container .card .card-content p.content {
-    height: 150px;
-    overflow-y: auto;
+  height: 150px;
+  overflow-y: auto;
 }
 
 .details-container {
-    min-height: 100%;
-    display: -webkit-flex;
-    display: flex;
+  min-height: 100%;
+  display: -webkit-flex;
+  display: flex;
 
-    -webkit-align-items: center;
-    align-items: center;
+  -webkit-align-items: center;
+  align-items: center;
 
-    -webkit-justify-content: center;
-    justify-content: center;
+  -webkit-justify-content: center;
+  justify-content: center;
 
 }
 
 .details {
-    cursor: auto;
-    width: 80%;
+  cursor: auto;
+  width: 80%;
 }
 
 .details .card-content {
-    margin-bottom: 30px;
-    max-height: 80%;
+  margin-bottom: 30px;
+  max-height: 80%;
 }
 
 .details .card-content p.content {
-    overflow-y: auto;
+  overflow-y: auto;
 }
 
 .card-action i {
-    font-size: 12px;
+  font-size: 12px;
+}
+
+.card-container .card .card-content .card-title {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 370px;
 }

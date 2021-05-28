@@ -21,11 +21,13 @@ type App struct {
 func NewApp() *App {
 	return NewAppWithVersion(time.Now().Format(time.RFC3339) + "-build")
 }
+
 func NewAppWithVersion(version string) *App {
 	return &App{
 		version: version,
 	}
 }
+
 func (a App) Run(args []string) {
 	app := cli.NewApp()
 	app.Version = a.version
@@ -41,6 +43,7 @@ func (a App) Run(args []string) {
 
 	app.Run(args)
 }
+
 func (a App) start(c *cli.Context) error {
 	err := a.loadConfig(c.GlobalString("config-path"))
 	if err != nil {
@@ -51,7 +54,11 @@ func (a App) start(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	api := a.bootstrapApi(mDrivers)
+	processor, err := a.bootstrapProcessor(mDrivers)
+	if err != nil {
+		return err
+	}
+	api := a.bootstrapApi(mDrivers, processor)
 	r := mux.NewRouter()
 	api.Register(r)
 	r.NewRoute().Handler(http.FileServer(assetFS()))
@@ -60,7 +67,8 @@ func (a App) start(c *cli.Context) error {
 
 	return http.ListenAndServe(a.config.ListenAddr, r)
 }
-func (a App) bootstrapApi(d map[string]drivers.Driver) *API {
+
+func (a App) bootstrapApi(d map[string]drivers.Driver, processor *Processor) *API {
 	driversName := make([]string, 0)
 	for driverName, _ := range d {
 		driversName = append(driversName, driverName)
@@ -71,11 +79,16 @@ func (a App) bootstrapApi(d map[string]drivers.Driver) *API {
 			return true
 		}
 	}
-	return NewApi(a.bootstrapProcessor(d), upgrader, a.config.Probes, driversName)
+	return NewApi(processor, upgrader, a.config.Probes, driversName)
 }
 
-func (a App) bootstrapProcessor(d map[string]drivers.Driver) *Processor {
-	return NewProcessor(d, a.bootstrapConverter(), a.config.DropLabels)
+func (a App) bootstrapProcessor(d map[string]drivers.Driver) (*Processor, error) {
+	processor := NewProcessor(d, a.bootstrapConverter(), a.config.DropLabels)
+	err := processor.StartPeriodics()
+	if err != nil {
+		return nil, err
+	}
+	return processor, nil
 }
 
 func (a App) bootstrapConverter() converters.Converter {
@@ -99,6 +112,7 @@ func (a App) bootstrapDrivers() (map[string]drivers.Driver, error) {
 	}
 	return mDrivers, nil
 }
+
 func (a *App) loadConfig(configPath string) error {
 	c, err := model.LoadFile(configPath)
 	if err != nil {
